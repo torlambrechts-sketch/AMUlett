@@ -11,6 +11,15 @@ npm run dev
 
 Copy `.env.example` to `.env.local` and add your Supabase URL and anon key.
 
+### Authentication
+
+- **Sign up (first member):** `/[locale]/register` creates the auth user; if email confirmation is off, the app calls `bootstrap_user_organization` so the user becomes **org admin** of a new organization.
+- **Email confirmation:** If enabled, after the user confirms, open `/[locale]/onboarding` to run the same bootstrap (or sign in and complete onboarding).
+- **Invites:** Org admins use **Settings** to create an invitation (stores only a **hash** of the token). Share the link `/[locale]/invite?token=…` (copy button). The invitee must **register or sign in with the same email** as the invitation, then accept.
+- **Supabase dashboard:** Under Authentication → URL configuration, add redirect URLs such as `http://localhost:3000/*/auth/callback` and your production `https://your-domain.com/*/auth/callback` (or one entry per locale, e.g. `http://localhost:3000/nb/auth/callback`).
+
+Apply the SQL migration `20250326210000_invitation_rpcs.sql` so `get_invitation_preview`, `create_organization_invitation`, `accept_organization_invitation`, and `revoke_organization_invitation` exist.
+
 ## Database
 
 SQL migrations live in `supabase/migrations`. Apply them in the Supabase SQL editor or via the Supabase CLI. They define:

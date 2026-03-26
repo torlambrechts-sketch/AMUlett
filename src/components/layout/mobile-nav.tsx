@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -51,6 +52,9 @@ export function MobileNav() {
               </button>
             </div>
             <SidebarNav onNavigate={() => setOpen(false)} />
+            <div className="border-t border-[var(--color-border)] p-4">
+              <SignOutButton />
+            </div>
           </div>
         </div>
       ) : null}

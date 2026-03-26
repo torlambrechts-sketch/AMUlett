@@ -3,6 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { SignOutButton } from "@/components/auth/sign-out-button";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function AppShell({
   title,
@@ -13,6 +15,14 @@ export async function AppShell({
 }) {
   const t = await getTranslations("nav");
   const searchPh = t("searchPlaceholder");
+  const supabase = await createSupabaseServerClient();
+  let userEmail: string | null = null;
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userEmail = user?.email ?? null;
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -26,7 +36,13 @@ export async function AppShell({
           <SidebarNav />
         </div>
         <div className="border-t border-[var(--color-border)] p-4">
-          <p className="text-xs text-[var(--color-text-muted)]">{t("sidebarHint")}</p>
+          {userEmail ? (
+            <p className="mb-3 truncate text-xs text-[var(--color-text-secondary)]" title={userEmail}>
+              {userEmail}
+            </p>
+          ) : null}
+          <SignOutButton />
+          <p className="mt-3 text-xs text-[var(--color-text-muted)]">{t("sidebarHint")}</p>
         </div>
       </aside>
 
@@ -53,9 +69,9 @@ export async function AppShell({
             <LocaleSwitcher />
             <div
               className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary-muted)] text-sm font-semibold text-[var(--color-primary)]"
-              title="Profile"
+              title={userEmail ?? "Profile"}
             >
-              U
+              {(userEmail?.[0] ?? "U").toUpperCase()}
             </div>
           </div>
         </header>
