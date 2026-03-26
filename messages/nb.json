@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "Hjem",
+    "tasks": "Oppgaver",
+    "workCouncil": "Verneombud / AMU",
+    "hse": "HMS",
+    "documents": "Dokumenter og wiki",
+    "surveys": "Undersøkelser",
+    "reports": "Varsling",
+    "learning": "E-læring",
+    "settings": "Innstillinger"
+  },
+  "dashboard": {
+    "title": "Oversikt etter arbeidsmiljøloven",
+    "intro": "Hvert område under støtter plikter etter arbeidsmiljøloven og tilhørende regler. Tekster, roller og organisasjonsdata ligger i databasen og Supabase-policyer—ikke hardkodet i koden.",
+    "modules": {
+      "tasks": "Oppgaver og sjekklister",
+      "tasksDesc": "Oppfølging, frister og dokumentasjon av statlige og interne krav.",
+      "workCouncil": "Arbeidsmiljøutvalg / verneombud",
+      "workCouncilDesc": "Møter med fast agenda, deltakere, protokoll, avstemning og revisjonsspor.",
+      "hse": "HMS",
+      "hseDesc": "Helse, miljø og sikkerhet i tråd med det systematiske HMS-arbeidet.",
+      "documents": "Dokumenter og wiki",
+      "documentsDesc": "Håndbøker, risikovurderinger og prosedyrer med strukturerte sider og vedlegg.",
+      "surveys": "Psykososiale undersøkelser",
+      "surveysDesc": "MAP og andre undersøkelser for det psykososiale arbeidsmiljøet.",
+      "reports": "Varsling",
+      "reportsDesc": "Konfidensielt varslingsløp med saksbehandling og tilgangskontroll.",
+      "learning": "E-læring",
+      "learningDesc": "Kurs med rikt innhold, quiz, flashkort og JSON import/eksport for administratorer.",
+      "settings": "Organisasjon og tilgang",
+      "settingsDesc": "Invitasjoner, roller knyttet til lovpålagte funksjoner og språkvalg."
+    }
+  },
+  "modules": {
+    "tasks": "Oppgavestyring",
+    "tasksPlaceholder": "Oppgavemaler, ansvarlige, frister og sjekkpunkter lagres per organisasjon. Koble denne visningen til Supabase-spørringer og mutasjoner.",
+    "workCouncil": "AMU / vernetjeneste",
+    "workCouncilPlaceholder": "Planlegg møter, lås agenda, registrer deltakelse, uforanderlig logg og avstemning om valgte roller—alt innenfor organisasjonen.",
+    "hse": "HMS",
+    "hsePlaceholder": "Risikovurderinger, vernerunder, avvik og tiltak med RLS knyttet til HMS-roller.",
+    "documents": "Dokumenter og wiki",
+    "documentsPlaceholder": "Wiki-rom, versjonert rik tekst (samme redigeringsmotor som kurs) og filer i Supabase Storage med metadata i Postgres.",
+    "surveys": "Undersøkelser",
+    "surveysPlaceholder": "Anonyme eller identifiserte undersøkelser, gjentakende kampanjer og rapportering.",
+    "reports": "Varsling",
+    "reportsPlaceholder": "Innmelding, saksflyt og strenge rollekrav for behandlere.",
+    "learning": "E-læring",
+    "learningPlaceholder": "Bygg kurs, flashkort, korte meldingsblokker, medier og quiz; JSON for import og eksport.",
+    "settings": "Innstillinger",
+    "settingsPlaceholder": "Organisasjonsprofil, språk, invitasjoner og roller som speiler lovpålagte funksjoner."
+  },
+  "compliance": {
+    "title": "Kobling mot loven (data)",
+    "subtitle": "Disse radene er seeded ut fra strukturen i arbeidsmiljøloven. Utvid eller endre i databasen; grensesnittet leser bare data."
+  }
+}

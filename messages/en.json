@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "Home",
+    "tasks": "Tasks",
+    "workCouncil": "Work council",
+    "hse": "HSE",
+    "documents": "Documents & wiki",
+    "surveys": "Surveys",
+    "reports": "Reports",
+    "learning": "E-learning",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Compliance overview",
+    "intro": "Each area below maps to obligations under the Working Environment Act and related rules. Configuration, copy, and permissions live in the database and Supabase policies—not in the application code.",
+    "modules": {
+      "tasks": "Tasks & checklists",
+      "tasksDesc": "Follow-up actions, deadlines, and evidence for statutory duties.",
+      "workCouncil": "Work council (AMU/VB)",
+      "workCouncilDesc": "Meetings with fixed agendas, participants, minutes, voting, and audit trail.",
+      "hse": "HSE",
+      "hseDesc": "Health, safety, and environment registers aligned with the internal control duty.",
+      "documents": "Documents & wiki",
+      "documentsDesc": "Handbooks, risk assessments, and procedures with structured pages and uploads.",
+      "surveys": "Psychosocial surveys",
+      "surveysDesc": "MAP and other surveys to assess and improve the psychosocial environment.",
+      "reports": "Whistleblowing & alerts",
+      "reportsDesc": "Confidential reporting channel with case handling and access control.",
+      "learning": "E-learning",
+      "learningDesc": "Courses with rich content, quizzes, flash cards, and JSON import/export.",
+      "settings": "Organization & access",
+      "settingsDesc": "Invitations, roles, locales, and integration settings."
+    }
+  },
+  "modules": {
+    "tasks": "Task management",
+    "tasksPlaceholder": "Task templates, assignments, due dates, and checklist items are stored per organization. Connect this view to Supabase queries and mutations.",
+    "workCouncil": "Work council",
+    "workCouncilPlaceholder": "Plan meetings, enforce agenda order, record attendance, append-only audit log, and run ballots for elected roles—all scoped to your organization.",
+    "hse": "HSE",
+    "hsePlaceholder": "Risk assessments, inspections, incidents, and action tracking with RLS tied to HSE roles.",
+    "documents": "Documents & wiki",
+    "documentsPlaceholder": "Hierarchical wiki spaces, versioned rich text (same editor as courses), and file attachments in Supabase Storage with metadata in Postgres.",
+    "surveys": "Surveys",
+    "surveysPlaceholder": "Anonymous or identified surveys, recurring campaigns, and reporting for the psychosocial working environment.",
+    "reports": "Whistleblowing & alerts",
+    "reportsPlaceholder": "Report intake, triage workflow, and strict separation of duties for reviewers.",
+    "learning": "E-learning",
+    "learningPlaceholder": "Author courses, add flash cards, short messages, media blocks, and quizzes; export and import course definitions as JSON for admins.",
+    "settings": "Settings",
+    "settingsPlaceholder": "Organization profile, locales, invitations, and role assignments mapped to legal responsibilities."
+  },
+  "compliance": {
+    "title": "Legal mapping (data-driven)",
+    "subtitle": "These rows are seeded from the Working Environment Act structure. Extend or edit them in the database; the UI only reads them."
+  }
+}
