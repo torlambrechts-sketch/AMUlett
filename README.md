@@ -30,3 +30,5 @@ Design tokens are CSS variables in `src/app/globals.css`: semantic colors, radii
 Deploy to Vercel and connect the same Supabase project. Ensure environment variables match `.env.example`.
 
 Edge routing for locales and Supabase session refresh uses `src/proxy.ts` (Next.js 16 proxy convention).
+
+**Vercel:** leave **Root Directory** empty (repository root, where this `package.json` and `vercel.json` live). If it is set to `src` or another folder, Vercel will not see `next` in dependencies and you get “No Next.js version detected”.
