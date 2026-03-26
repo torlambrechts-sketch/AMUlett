@@ -25,6 +25,8 @@ New users can call the `bootstrap_user_organization` RPC once to create their fi
 
 Design tokens are CSS variables in `src/app/globals.css`: semantic colors, radii, and focus rings. Prefer these over ad hoc hex values. Keep copy in `messages/*.json` or in the database—not in React components.
 
+The shell layout (sidebar, top bar, teal accent, Inter) is aligned with the public **TeamHub – HR Management Dashboard** Figma reference; swap token values if your file uses different variables.
+
 ## Deploy
 
 Deploy to Vercel and connect the same Supabase project. Ensure environment variables match `.env.example`.

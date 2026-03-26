@@ -1,18 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
-
-const navKeys = [
-  { href: "/", key: "home" as const },
-  { href: "/tasks", key: "tasks" as const },
-  { href: "/work-council", key: "workCouncil" as const },
-  { href: "/hse", key: "hse" as const },
-  { href: "/documents", key: "documents" as const },
-  { href: "/surveys", key: "surveys" as const },
-  { href: "/reports", key: "reports" as const },
-  { href: "/learning", key: "learning" as const },
-  { href: "/settings", key: "settings" as const },
-];
+import { SidebarNav } from "@/components/layout/sidebar-nav";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 export async function AppShell({
   title,
@@ -22,32 +12,56 @@ export async function AppShell({
   children: React.ReactNode;
 }) {
   const t = await getTranslations("nav");
+  const searchPh = t("searchPlaceholder");
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4">
-          <Link href="/" className="text-lg font-semibold text-[var(--color-primary)]">
+    <div className="flex min-h-screen">
+      <aside className="sticky top-0 hidden h-screen w-[var(--sidebar-w)] shrink-0 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)] lg:flex">
+        <div className="flex h-16 items-center border-b border-[var(--color-border)] px-5">
+          <Link href="/" className="text-base font-semibold tracking-tight text-[var(--color-text)]">
             AMUlett
           </Link>
-          <nav className="flex flex-wrap items-center gap-1 text-sm">
-            {navKeys.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-[var(--radius-sm)] px-2 py-1 text-[var(--color-text-muted)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text)]"
-              >
-                {t(item.key)}
-              </Link>
-            ))}
-          </nav>
-          <LocaleSwitcher />
         </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <h1 className="mb-6 text-2xl font-bold tracking-tight">{title}</h1>
-        {children}
-      </main>
+        <div className="flex-1 overflow-y-auto py-2">
+          <SidebarNav />
+        </div>
+        <div className="border-t border-[var(--color-border)] p-4">
+          <p className="text-xs text-[var(--color-text-muted)]">{t("sidebarHint")}</p>
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 shadow-[var(--shadow-sm)]">
+          <MobileNav />
+          <div className="min-w-0 flex-1 lg:pl-0">
+            <h1 className="truncate text-lg font-semibold tracking-tight text-[var(--color-text)] lg:text-xl">
+              {title}
+            </h1>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <label className="hidden items-center gap-2 sm:flex">
+              <span className="sr-only">Search</span>
+              <input
+                type="search"
+                placeholder={searchPh}
+                className="h-9 w-40 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] md:w-56"
+                readOnly
+                aria-readonly="true"
+                title="Connect to search when backend is ready"
+              />
+            </label>
+            <LocaleSwitcher />
+            <div
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary-muted)] text-sm font-semibold text-[var(--color-primary)]"
+              title="Profile"
+            >
+              U
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 px-4 py-6 md:px-6 lg:px-8">{children}</main>
+      </div>
     </div>
   );
 }

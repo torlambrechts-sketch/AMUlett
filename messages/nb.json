@@ -1,5 +1,7 @@
 {
   "nav": {
+    "sidebarHint": "Samsvarsarbeid — roller og data fra organisasjonen din.",
+    "searchPlaceholder": "Søk…",
     "home": "Hjem",
     "tasks": "Oppgaver",
     "workCouncil": "Verneombud / AMU",

@@ -84,9 +84,9 @@ function ModuleCard({
   return (
     <Link
       href={href}
-      className="group rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)] transition hover:border-[var(--color-accent)]"
+      className="group rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-card)] transition hover:border-[var(--color-primary)]"
     >
-      <h2 className="text-lg font-semibold text-[var(--color-text)] group-hover:text-[var(--color-accent)]">
+      <h2 className="text-lg font-semibold text-[var(--color-text)] group-hover:text-[var(--color-primary)]">
         {title}
       </h2>
       <p className="mt-2 text-sm text-[var(--color-text-muted)]">{desc}</p>

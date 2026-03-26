@@ -1,5 +1,7 @@
 {
   "nav": {
+    "sidebarHint": "Compliance workspace — roles and data from your organization.",
+    "searchPlaceholder": "Search…",
     "home": "Home",
     "tasks": "Tasks",
     "workCouncil": "Work council",
