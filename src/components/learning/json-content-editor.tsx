@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import type { LearningBlockType } from "@/lib/learning/types";
-import { LearningContentEditor } from "@/components/editor/learning-content-editor";
+import { LearningContentEditor } from "@modules/editor";
 
 export function JsonContentEditor({
   content,

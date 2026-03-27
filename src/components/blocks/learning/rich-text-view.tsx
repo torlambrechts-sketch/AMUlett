@@ -1,6 +1,6 @@
 import DOMPurify from "isomorphic-dompurify";
 import type { RichTextContent } from "@/lib/learning/types";
-import { paragraphsToHtml } from "@/lib/editor/rich-text-html";
+import { paragraphsToHtml } from "@modules/editor";
 
 export function RichTextView({ content }: { content: RichTextContent & { html?: string } }) {
   const html =

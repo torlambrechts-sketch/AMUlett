@@ -8,7 +8,7 @@ import { parseWikiDocument, type WikiEditorDocument } from "@/lib/wiki/types";
 import { wikiDocumentToPlainText } from "@/lib/wiki/plain-text";
 import { WikiDocView } from "@/components/wiki/wiki-doc-view";
 import { WikiPresenceBar } from "@/components/wiki/wiki-presence";
-import { WikiBlocksEditor } from "@/components/editor/wiki-blocks-editor";
+import { WikiBlocksEditor } from "@modules/editor";
 import { resolveLocalized } from "@/lib/learning/localize";
 
 export function WikiPageEditor({

@@ -14,9 +14,9 @@ import {
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { LearningBlockType } from "@/lib/learning/types";
-import { newBlockId } from "@/lib/editor/id";
-import { RichTextField } from "@/components/editor/tiptap-editor";
-import { paragraphsToHtml, richTextContentToHtml, stripHtmlToPlain } from "@/lib/editor/rich-text-html";
+import { newBlockId } from "./id";
+import { RichTextField } from "./rich-text-field";
+import { paragraphsToHtml, richTextContentToHtml, stripHtmlToPlain } from "./rich-text-html";
 
 type Props = {
   moduleType: LearningBlockType;

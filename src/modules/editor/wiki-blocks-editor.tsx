@@ -13,9 +13,9 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, v
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslations } from "next-intl";
 import type { WikiBlock, WikiCalloutVariant } from "@/lib/wiki/types";
-import { newBlockId } from "@/lib/editor/id";
-import { RichTextField } from "@/components/editor/tiptap-editor";
-import { paragraphsToHtml, stripHtmlToPlain } from "@/lib/editor/rich-text-html";
+import { newBlockId } from "./id";
+import { RichTextField } from "./rich-text-field";
+import { paragraphsToHtml, stripHtmlToPlain } from "./rich-text-html";
 
 export function WikiBlocksEditor({
   blocks,
