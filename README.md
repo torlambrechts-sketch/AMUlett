@@ -22,7 +22,9 @@ Apply the SQL migration `20250326210000_invitation_rpcs.sql` so `get_invitation_
 
 ## Database
 
-SQL migrations live in `supabase/migrations`. Apply them in the Supabase SQL editor or via the Supabase CLI. They define:
+SQL migrations live in `supabase/migrations`. Apply them in the Supabase SQL editor or via the Supabase CLI. To run everything in one go, paste **`supabase/ALL_MIGRATIONS.sql`** into **SQL → New query** (anon keys cannot execute DDL).
+
+They define:
 
 - Organizations, invitations, JSON-localized roles and capabilities, and row level security
 - Tables for each product area (tasks, work council with append-only audit log and ballots, HSE, wiki revisions, surveys, whistleblower cases, learning courses/modules)
