@@ -340,7 +340,10 @@
     "removeBlock": "Remove block",
     "calloutTitle": "Callout title",
     "calloutBody": "Body",
-    "markdownFullPage": "Full page (Markdown)"
+    "markdownFullPage": "Full page (Markdown)",
+    "richTextPlaceholder": "Start writing…",
+    "richTextHint": "Formatting is saved as HTML. Use JSON tab for raw edits.",
+    "wikiRichBody": "Rich text"
   },
   "settingsInvites": {
     "organizationTitle": "Organization",

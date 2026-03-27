@@ -120,17 +120,23 @@ function SortableModuleCard({
         </div>
       ) : null}
 
-      <JsonContentEditor
-        key={mod.id}
-        readOnly={readOnly}
-        moduleType={mod.module_type}
-        content={mod.content}
-        onChange={(c) => onContentChange(mod.id, c)}
-        onSave={(c) => onContentSave(mod.id, c)}
-      />
-      <div className="mt-4 border-t border-[var(--color-border)] pt-4">
-        <p className="mb-2 text-xs text-[var(--color-text-muted)]">{t("preview")}</p>
-        <LearningBlockRenderer type={mod.module_type} content={mod.content} courseId={courseId} />
+      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(0,380px)]">
+        <div className="min-w-0">
+          <JsonContentEditor
+            key={mod.id}
+            readOnly={readOnly}
+            moduleType={mod.module_type}
+            content={mod.content}
+            onChange={(c) => onContentChange(mod.id, c)}
+            onSave={(c) => onContentSave(mod.id, c)}
+          />
+        </div>
+        <div className="min-w-0">
+          <p className="mb-2 text-xs font-medium text-[var(--color-text-muted)]">{t("preview")}</p>
+          <div className="max-h-[min(70vh,520px)] overflow-y-auto rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4">
+            <LearningBlockRenderer type={mod.module_type} content={mod.content} courseId={courseId} />
+          </div>
+        </div>
       </div>
     </div>
   );

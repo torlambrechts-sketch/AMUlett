@@ -1,7 +1,7 @@
 export type WikiCalloutVariant = "info" | "warning" | "tip";
 
 export type WikiBlock =
-  | { id: string; type: "text"; content: string }
+  | { id: string; type: "text"; content: string; html?: string }
   | { id: string; type: "callout"; variant: WikiCalloutVariant; title?: string; body: string }
   | { id: string; type: "code"; language: string; code: string }
   | { id: string; type: "embed"; url: string; title?: string };
@@ -13,7 +13,7 @@ export type WikiEditorDocument = {
 };
 
 export function emptyWikiDocument(): WikiEditorDocument {
-  return { format: "blocks", blocks: [{ id: "b0", type: "text", content: "" }], markdown: "" };
+  return { format: "blocks", blocks: [{ id: "b0", type: "text", content: "", html: "<p></p>" }], markdown: "" };
 }
 
 export function parseWikiDocument(raw: unknown): WikiEditorDocument {

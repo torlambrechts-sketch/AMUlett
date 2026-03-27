@@ -14,6 +14,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { useTranslations } from "next-intl";
 import type { WikiBlock, WikiCalloutVariant } from "@/lib/wiki/types";
 import { newBlockId } from "@/lib/editor/id";
+import { RichTextField } from "@/components/editor/tiptap-editor";
+import { paragraphsToHtml, stripHtmlToPlain } from "@/lib/editor/rich-text-html";
 
 export function WikiBlocksEditor({
   blocks,
@@ -46,7 +48,7 @@ export function WikiBlocksEditor({
     let block: WikiBlock;
     switch (type) {
       case "text":
-        block = { id, type: "text", content: "" };
+        block = { id, type: "text", content: "", html: "<p></p>" };
         break;
       case "callout":
         block = { id, type: "callout", variant: "info", title: "", body: "" };
@@ -172,14 +174,30 @@ function SortableWikiBlockRow({
 
       {block.type === "text" ? (
         <div>
-          <label className="mb-1 block text-xs text-[var(--color-text-muted)]">{t("wikiMarkdownBody")}</label>
-          <textarea
-            className={`${fc} min-h-[120px] font-mono text-xs`}
-            value={block.content}
-            onChange={(e) => onChange(block.id, { content: e.target.value })}
-            readOnly={readOnly}
-          />
-          <p className="mt-1 text-xs text-[var(--color-text-muted)]">{t("wikiLinkHint")}</p>
+          {readOnly ? null : (
+            <label className="mb-1 block text-xs text-[var(--color-text-muted)]">{t("wikiRichBody")}</label>
+          )}
+          {readOnly ? (
+            <textarea className={`${fc} min-h-[80px] font-mono text-xs`} readOnly value={(block as { content?: string }).content ?? ""} />
+          ) : (
+            <>
+              <RichTextField
+                key={block.id}
+                value={(() => {
+                  const tb = block as { html?: string; content?: string };
+                  return tb.html?.trim() ? tb.html : paragraphsToHtml([{ text: tb.content ?? "" }]);
+                })()}
+                placeholder={t("richTextPlaceholder")}
+                onChange={(html) =>
+                  onChange(block.id, {
+                    html,
+                    content: stripHtmlToPlain(html),
+                  } as Partial<WikiBlock>)
+                }
+              />
+              <p className="mt-1 text-xs text-[var(--color-text-muted)]">{t("wikiLinkHint")}</p>
+            </>
+          )}
         </div>
       ) : null}
 

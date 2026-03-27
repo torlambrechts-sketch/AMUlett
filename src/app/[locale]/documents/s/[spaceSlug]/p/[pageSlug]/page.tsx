@@ -7,7 +7,7 @@ import { getUserOrgContext } from "@/lib/org/server";
 import { resolveLocalized } from "@/lib/learning/localize";
 import { WikiDocView } from "@/components/wiki/wiki-doc-view";
 import { WikiToc } from "@/components/wiki/wiki-toc";
-import { extractTocFromBlocks, extractTocFromMarkdown } from "@/lib/wiki/toc";
+import { extractTocFromHtml, extractTocFromMarkdown } from "@/lib/wiki/toc";
 import { parseWikiDocument } from "@/lib/wiki/types";
 import { userCanWikiWrite, userIsOrgAdmin } from "@/lib/wiki/server-access";
 import { WikiFavoriteButton } from "@/components/wiki/wiki-favorite-button";
@@ -66,16 +66,27 @@ export default async function WikiPageView({ params }: Props) {
 
   const titleRes = resolveLocalized(page.title as Record<string, string>, locale);
   const doc = parseWikiDocument(rev?.editor_document);
-  let tocSource = "";
-  if (doc.format === "markdown") tocSource = doc.markdown;
-  else {
-    tocSource = doc.blocks
-      .filter((b) => b.type === "text")
-      .map((b) => (b as { content?: string }).content ?? "")
-      .join("\n");
-  }
-  const tocEntries =
-    doc.format === "markdown" ? extractTocFromMarkdown(tocSource) : extractTocFromBlocks(tocSource);
+  let tocEntries =
+    doc.format === "markdown"
+      ? extractTocFromMarkdown(doc.markdown)
+      : (() => {
+          const combined: { level: number; text: string; id: string }[] = [];
+          let hi = 0;
+          for (const b of doc.blocks) {
+            if (b.type !== "text") continue;
+            const tb = b as { html?: string; content?: string };
+            if (tb.html?.trim()) {
+              for (const e of extractTocFromHtml(tb.html)) {
+                combined.push({ ...e, id: `${b.id}-${e.id}-${hi++}` });
+              }
+            } else {
+              for (const e of extractTocFromMarkdown(tb.content ?? "")) {
+                combined.push({ ...e, id: `${b.id}-${e.id}-${hi++}` });
+              }
+            }
+          }
+          return combined;
+        })();
 
   const { data: tagRows } = await supabase
     .from("wiki_page_tags")

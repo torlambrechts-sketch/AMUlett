@@ -340,7 +340,10 @@
     "removeBlock": "Fjern blokk",
     "calloutTitle": "Utropstittel",
     "calloutBody": "Brødtekst",
-    "markdownFullPage": "Hele siden (Markdown)"
+    "markdownFullPage": "Hele siden (Markdown)",
+    "richTextPlaceholder": "Begynn å skrive…",
+    "richTextHint": "Formatering lagres som HTML. Bruk JSON-fanen for råredigering.",
+    "wikiRichBody": "Rik tekst"
   },
   "settingsInvites": {
     "organizationTitle": "Organisasjon",

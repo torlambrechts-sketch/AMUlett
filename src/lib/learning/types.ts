@@ -44,6 +44,9 @@ export type LearningModuleRow = {
 };
 
 export type RichTextContent = {
+  /** TipTap / ProseMirror HTML (preferred when set). */
+  html?: string;
+  /** Legacy plain paragraphs; used when html is empty. */
   paragraphs?: { text: string }[];
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import type { LearningBlockType } from "@/lib/learning/types";
 import { LearningContentEditor } from "@/components/editor/learning-content-editor";
@@ -23,6 +23,8 @@ export function JsonContentEditor({
   const [text, setText] = useState(() => JSON.stringify(content, null, 2));
   const [err, setErr] = useState<string | null>(null);
   const [mode, setMode] = useState<"visual" | "json">("visual");
+  const [visualResetKey, setVisualResetKey] = useState(0);
+  const bumpVisual = useCallback(() => setVisualResetKey((k) => k + 1), []);
 
   const showVisual = moduleType && !readOnly;
 
@@ -36,6 +38,7 @@ export function JsonContentEditor({
             onClick={() => {
               setText(JSON.stringify(content, null, 2));
               setErr(null);
+              bumpVisual();
               setMode("visual");
             }}
           >
@@ -60,6 +63,7 @@ export function JsonContentEditor({
           <LearningContentEditor
             moduleType={moduleType}
             content={content}
+            editorResetKey={visualResetKey}
             onChange={(c) => {
               onChange(c);
               setText(JSON.stringify(c, null, 2));

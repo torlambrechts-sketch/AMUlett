@@ -7,7 +7,7 @@ function rid() {
 export function defaultContentForType(type: LearningBlockType): Record<string, unknown> {
   switch (type) {
     case "rich_text":
-      return { paragraphs: [{ text: "" }] };
+      return { html: "<p></p>", paragraphs: [{ text: "" }] };
     case "flash_cards":
       return { cards: [{ front: "", back: "" }] };
     case "short_message":

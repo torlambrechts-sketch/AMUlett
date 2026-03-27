@@ -1,10 +1,25 @@
+import DOMPurify from "isomorphic-dompurify";
 import { WikiMarkdown } from "@/components/wiki/wiki-markdown";
 import type { WikiBlock } from "@/lib/wiki/types";
 
 export function WikiBlockRenderer({ block, spaceSlug }: { block: WikiBlock; spaceSlug: string }) {
   switch (block.type) {
-    case "text":
+    case "text": {
+      const html = block.html?.trim();
+      if (html) {
+        const safe = DOMPurify.sanitize(html, {
+          ALLOWED_TAGS: ["p", "br", "strong", "b", "em", "i", "u", "s", "h2", "h3", "ul", "ol", "li", "a", "blockquote", "code", "pre"],
+          ALLOWED_ATTR: ["href", "target", "rel", "class"],
+        });
+        return (
+          <div
+            className="prose prose-sm max-w-none text-[var(--color-text)] [&_a]:text-[var(--color-primary)] [&_a]:underline"
+            dangerouslySetInnerHTML={{ __html: safe }}
+          />
+        );
+      }
       return <WikiMarkdown source={block.content ?? ""} spaceSlug={spaceSlug} />;
+    }
     case "callout": {
       const styles = {
         info: "border-blue-200 bg-blue-50 text-blue-950 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-100",

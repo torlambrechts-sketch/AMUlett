@@ -1,17 +1,33 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import type { LearningBlockType } from "@/lib/learning/types";
 import { newBlockId } from "@/lib/editor/id";
+import { RichTextField } from "@/components/editor/tiptap-editor";
+import { paragraphsToHtml, richTextContentToHtml, stripHtmlToPlain } from "@/lib/editor/rich-text-html";
 
 type Props = {
   moduleType: LearningBlockType;
   content: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
   readOnly?: boolean;
+  /** Bump when switching to visual from JSON so TipTap reloads. */
+  editorResetKey?: number;
 };
 
-export function LearningContentEditor({ moduleType, content, onChange, readOnly }: Props) {
+export function LearningContentEditor({ moduleType, content, onChange, readOnly, editorResetKey = 0 }: Props) {
   const t = useTranslations("editor");
 
   if (readOnly) {
@@ -20,7 +36,7 @@ export function LearningContentEditor({ moduleType, content, onChange, readOnly 
 
   switch (moduleType) {
     case "rich_text":
-      return <RichTextFields content={content} onChange={onChange} t={t} />;
+      return <RichTextFields content={content} onChange={onChange} t={t} resetKey={editorResetKey} />;
     case "flash_cards":
       return <FlashCardsFields content={content} onChange={onChange} t={t} />;
     case "short_message":
@@ -68,52 +84,41 @@ function RichTextFields({
   content,
   onChange,
   t,
+  resetKey,
 }: {
   content: Record<string, unknown>;
   onChange: (c: Record<string, unknown>) => void;
   t: (k: string) => string;
+  resetKey: number;
 }) {
-  const paragraphs: { text: string }[] = Array.isArray(content.paragraphs)
-    ? (content.paragraphs as { text?: string }[]).map((p) => ({ text: p.text ?? "" }))
-    : [{ text: "" }];
-
-  function setParagraphs(next: { text: string }[]) {
-    onChange({ ...content, paragraphs: next });
-  }
+  const html = richTextContentToHtml(content);
 
   return (
-    <div className="space-y-3">
-      {paragraphs.map((p, i) => (
-        <div key={i} className="rounded-[var(--radius-md)] border border-[var(--color-border)] p-3">
-          <label className={labelClass()}>{t("paragraph")} {i + 1}</label>
-          <textarea
-            className={fieldClass()}
-            rows={4}
-            value={p.text ?? ""}
-            onChange={(e) => {
-              const next = [...paragraphs];
-              next[i] = { text: e.target.value };
-              setParagraphs(next);
-            }}
-          />
-          <button
-            type="button"
-            className="mt-2 text-xs text-red-600"
-            onClick={() => setParagraphs(paragraphs.filter((_, j) => j !== i))}
-          >
-            {t("removeParagraph")}
-          </button>
-        </div>
-      ))}
-      <button
-        type="button"
-        className="text-sm text-[var(--color-primary)] hover:underline"
-        onClick={() => setParagraphs([...paragraphs, { text: "" }])}
-      >
-        + {t("addParagraph")}
-      </button>
+    <div className="space-y-2">
+      <RichTextField
+        resetKey={resetKey}
+        value={html}
+        placeholder={t("richTextPlaceholder")}
+        onChange={(htmlNext) => {
+          const plain = stripHtmlToPlain(htmlNext);
+          const paragraphs = plain ? plain.split(/\n\n+/).map((text) => ({ text })) : [{ text: "" }];
+          onChange({ ...content, html: htmlNext, paragraphs });
+        }}
+      />
+      <p className="text-xs text-[var(--color-text-muted)]">{t("richTextHint")}</p>
     </div>
   );
+}
+
+type FlashCardRow = { id: string; front: string; back: string };
+
+function normalizeFlashCards(raw: unknown): FlashCardRow[] {
+  const arr = Array.isArray(raw) ? raw : [{ front: "", back: "" }];
+  return (arr as { id?: string; front?: string; back?: string }[]).map((c, i) => ({
+    id: typeof c.id === "string" && c.id ? c.id : `fc-temp-${i}`,
+    front: c.front ?? "",
+    back: c.back ?? "",
+  }));
 }
 
 function FlashCardsFields({
@@ -125,51 +130,128 @@ function FlashCardsFields({
   onChange: (c: Record<string, unknown>) => void;
   t: (k: string) => string;
 }) {
-  const cards: { front: string; back: string }[] = Array.isArray(content.cards)
-    ? (content.cards as { front?: string; back?: string }[]).map((c) => ({
-        front: c.front ?? "",
-        back: c.back ?? "",
-      }))
-    : [{ front: "", back: "" }];
+  const hydrated = useRef(false);
+  useEffect(() => {
+    if (hydrated.current) return;
+    const arr = content.cards;
+    if (!Array.isArray(arr) || arr.length === 0) {
+      hydrated.current = true;
+      return;
+    }
+    const needs = (arr as { id?: string }[]).some((c) => !c.id || String(c.id).startsWith("fc-temp-"));
+    if (needs) {
+      hydrated.current = true;
+      onChange({
+        ...content,
+        cards: (arr as { id?: string; front?: string; back?: string }[]).map((c) => ({
+          id: c.id && !String(c.id).startsWith("fc-temp-") ? c.id : newBlockId("fc"),
+          front: c.front ?? "",
+          back: c.back ?? "",
+        })),
+      });
+    } else hydrated.current = true;
+  }, [content, onChange]);
 
-  function setCards(next: { front: string; back: string }[]) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+  const cards = normalizeFlashCards(content.cards);
+
+  function setCards(next: FlashCardRow[]) {
     onChange({ ...content, cards: next });
   }
 
+  function onDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = cards.findIndex((c) => c.id === active.id);
+    const newIndex = cards.findIndex((c) => c.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    setCards(arrayMove(cards, oldIndex, newIndex));
+  }
+
   return (
-    <div className="space-y-4">
-      {cards.map((c, i) => (
-        <div key={i} className="rounded-[var(--radius-md)] border border-[var(--color-border)] p-3">
-          <p className="mb-2 text-xs font-medium text-[var(--color-text)]">{t("card")} {i + 1}</p>
-          <label className={labelClass()}>{t("front")}</label>
-          <textarea
-            className={fieldClass()}
-            rows={2}
-            value={c.front ?? ""}
-            onChange={(e) => {
-              const next = [...cards];
-              next[i] = { ...next[i]!, front: e.target.value, back: next[i]?.back ?? "" };
-              setCards(next);
-            }}
-          />
-          <label className={labelClass()}>{t("back")}</label>
-          <textarea
-            className={fieldClass()}
-            rows={2}
-            value={c.back ?? ""}
-            onChange={(e) => {
-              const next = [...cards];
-              next[i] = { front: next[i]?.front ?? "", back: e.target.value };
-              setCards(next);
-            }}
-          />
-          <button type="button" className="mt-2 text-xs text-red-600" onClick={() => setCards(cards.filter((_, j) => j !== i))}>
-            {t("removeCard")}
-          </button>
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+      <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-4">
+          {cards.map((c, i) => (
+            <SortableFlashCard
+              key={c.id}
+              card={c}
+              index={i}
+              t={t}
+              onChange={(patch) => {
+                const next = cards.map((x) => (x.id === c.id ? { ...x, ...patch } : x));
+                setCards(next);
+              }}
+              onRemove={() => setCards(cards.filter((x) => x.id !== c.id))}
+            />
+          ))}
         </div>
-      ))}
-      <button type="button" className="text-sm text-[var(--color-primary)] hover:underline" onClick={() => setCards([...cards, { front: "", back: "" }])}>
+      </SortableContext>
+      <button
+        type="button"
+        className="mt-2 text-sm text-[var(--color-primary)] hover:underline"
+        onClick={() => setCards([...cards, { id: newBlockId("fc"), front: "", back: "" }])}
+      >
         + {t("addCard")}
+      </button>
+    </DndContext>
+  );
+}
+
+function SortableFlashCard({
+  card,
+  index,
+  t,
+  onChange,
+  onRemove,
+}: {
+  card: FlashCardRow;
+  index: number;
+  t: (k: string) => string;
+  onChange: (patch: Partial<FlashCardRow>) => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.9 : 1 }}
+      className="rounded-[var(--radius-md)] border border-[var(--color-border)] p-3"
+    >
+      <div className="mb-2 flex items-center gap-2">
+        <button
+          type="button"
+          className="cursor-grab touch-none rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]"
+          {...attributes}
+          {...listeners}
+        >
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <path d="M8 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm10-12a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
+          </svg>
+        </button>
+        <p className="text-xs font-medium text-[var(--color-text)]">
+          {t("card")} {index + 1}
+        </p>
+      </div>
+      <label className={labelClass()}>{t("front")}</label>
+      <textarea
+        className={fieldClass()}
+        rows={2}
+        value={card.front}
+        onChange={(e) => onChange({ front: e.target.value })}
+      />
+      <label className={labelClass()}>{t("back")}</label>
+      <textarea
+        className={fieldClass()}
+        rows={2}
+        value={card.back}
+        onChange={(e) => onChange({ back: e.target.value })}
+      />
+      <button type="button" className="mt-2 text-xs text-red-600" onClick={onRemove}>
+        {t("removeCard")}
       </button>
     </div>
   );
@@ -189,17 +271,9 @@ function ShortMessageFields({ content, onChange }: { content: Record<string, unk
   );
 }
 
-function QuizFields({
-  content,
-  onChange,
-  t,
-}: {
-  content: Record<string, unknown>;
-  onChange: (c: Record<string, unknown>) => void;
-  t: (k: string) => string;
-}) {
-  const questions = Array.isArray(content.questions)
-    ? (content.questions as Record<string, unknown>[])
+function normalizeQuizQuestions(raw: unknown): Record<string, unknown>[] {
+  const arr = Array.isArray(raw) && raw.length
+    ? raw
     : [
         {
           id: newBlockId("q"),
@@ -211,9 +285,59 @@ function QuizFields({
           correctChoiceId: "a",
         },
       ];
+  return (arr as Record<string, unknown>[]).map((q, i) => ({
+    ...q,
+    id: typeof q.id === "string" && q.id ? q.id : `q-temp-${i}`,
+  }));
+}
+
+function QuizFields({
+  content,
+  onChange,
+  t,
+}: {
+  content: Record<string, unknown>;
+  onChange: (c: Record<string, unknown>) => void;
+  t: (k: string) => string;
+}) {
+  const hydrated = useRef(false);
+  useEffect(() => {
+    if (hydrated.current) return;
+    const raw = content.questions;
+    if (!Array.isArray(raw) || raw.length === 0) {
+      hydrated.current = true;
+      return;
+    }
+    const needs = (raw as { id?: string }[]).some((q) => !q.id || String(q.id).startsWith("q-temp-"));
+    if (needs) {
+      hydrated.current = true;
+      onChange({
+        ...content,
+        questions: (raw as Record<string, unknown>[]).map((q) => {
+          const id = q.id as string | undefined;
+          return id && !String(id).startsWith("q-temp-") ? q : { ...q, id: newBlockId("q") };
+        }),
+      });
+    } else hydrated.current = true;
+  }, [content, onChange]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+  const questions = normalizeQuizQuestions(content.questions);
 
   function setQuestions(next: Record<string, unknown>[]) {
     onChange({ ...content, questions: next });
+  }
+
+  function onDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = questions.findIndex((q) => q.id === active.id);
+    const newIndex = questions.findIndex((q) => q.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    setQuestions(arrayMove(questions, oldIndex, newIndex));
   }
 
   return (
@@ -231,57 +355,25 @@ function QuizFields({
           />
         </label>
       </div>
-      {questions.map((q, qi) => {
-        const choices = Array.isArray(q.choices) ? (q.choices as { id: string; label: string }[]) : [];
-        return (
-          <div key={String(q.id ?? qi)} className="rounded-[var(--radius-md)] border border-[var(--color-border)] p-3">
-            <label className={labelClass()}>{t("question")} {qi + 1}</label>
-            <input
-              className={fieldClass()}
-              value={typeof q.question === "string" ? q.question : ""}
-              onChange={(e) => {
-                const next = [...questions];
-                next[qi] = { ...next[qi]!, question: e.target.value };
-                setQuestions(next);
-              }}
-            />
-            <p className="mt-2 text-xs font-medium text-[var(--color-text)]">{t("choices")}</p>
-            {choices.map((ch, ci) => (
-              <div key={ch.id} className="mt-2 flex flex-wrap items-center gap-2">
-                <input
-                  type="radio"
-                  name={`correct-${qi}`}
-                  checked={q.correctChoiceId === ch.id}
-                  onChange={() => {
-                    const next = [...questions];
-                    next[qi] = { ...next[qi]!, correctChoiceId: ch.id };
-                    setQuestions(next);
-                  }}
-                  className="text-[var(--color-primary)]"
-                />
-                <input
-                  className="min-w-0 flex-1 rounded border px-2 py-1 text-sm"
-                  value={ch.label}
-                  onChange={(e) => {
-                    const next = [...questions];
-                    const nch = [...choices];
-                    nch[ci] = { ...nch[ci]!, label: e.target.value };
-                    next[qi] = { ...next[qi]!, choices: nch };
-                    setQuestions(next);
-                  }}
-                />
-              </div>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <SortableContext items={questions.map((q) => q.id as string)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-4">
+            {questions.map((q, qi) => (
+              <SortableQuizQuestion
+                key={q.id as string}
+                q={q}
+                qi={qi}
+                t={t}
+                onPatch={(patch) => {
+                  const next = questions.map((x, j) => (j === qi ? { ...x, ...patch } : x));
+                  setQuestions(next);
+                }}
+                onRemove={() => setQuestions(questions.filter((_, j) => j !== qi))}
+              />
             ))}
-            <button
-              type="button"
-              className="mt-2 text-xs text-red-600"
-              onClick={() => setQuestions(questions.filter((_, j) => j !== qi))}
-            >
-              {t("removeQuestion")}
-            </button>
           </div>
-        );
-      })}
+        </SortableContext>
+      </DndContext>
       <button
         type="button"
         className="text-sm text-[var(--color-primary)] hover:underline"
@@ -303,6 +395,77 @@ function QuizFields({
         }}
       >
         + {t("addQuestion")}
+      </button>
+    </div>
+  );
+}
+
+function SortableQuizQuestion({
+  q,
+  qi,
+  t,
+  onPatch,
+  onRemove,
+}: {
+  q: Record<string, unknown>;
+  qi: number;
+  t: (k: string) => string;
+  onPatch: (patch: Record<string, unknown>) => void;
+  onRemove: () => void;
+}) {
+  const id = q.id as string;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const choices = Array.isArray(q.choices) ? (q.choices as { id: string; label: string }[]) : [];
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.9 : 1 }}
+      className="rounded-[var(--radius-md)] border border-[var(--color-border)] p-3"
+    >
+      <div className="mb-2 flex items-center gap-2">
+        <button
+          type="button"
+          className="cursor-grab touch-none rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]"
+          {...attributes}
+          {...listeners}
+        >
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <path d="M8 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm10-12a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
+          </svg>
+        </button>
+        <label className={labelClass()}>
+          {t("question")} {qi + 1}
+        </label>
+      </div>
+      <input
+        className={fieldClass()}
+        value={typeof q.question === "string" ? q.question : ""}
+        onChange={(e) => onPatch({ question: e.target.value })}
+      />
+      <p className="mt-2 text-xs font-medium text-[var(--color-text)]">{t("choices")}</p>
+      {choices.map((ch, ci) => (
+        <div key={ch.id} className="mt-2 flex flex-wrap items-center gap-2">
+          <input
+            type="radio"
+            name={`correct-${id}`}
+            checked={q.correctChoiceId === ch.id}
+            onChange={() => onPatch({ correctChoiceId: ch.id })}
+            className="text-[var(--color-primary)]"
+          />
+          <input
+            className="min-w-0 flex-1 rounded border px-2 py-1 text-sm"
+            value={ch.label}
+            onChange={(e) => {
+              const nch = [...choices];
+              nch[ci] = { ...nch[ci]!, label: e.target.value };
+              onPatch({ choices: nch });
+            }}
+          />
+        </div>
+      ))}
+      <button type="button" className="mt-2 text-xs text-red-600" onClick={onRemove}>
+        {t("removeQuestion")}
       </button>
     </div>
   );
