@@ -15,3 +15,5 @@ Never commit service role keys or database passwords. Rotate keys if they are ex
 **Platform admins (LMS):** after `20250326220000_learning_lms.sql`, insert rows into `public.platform_admins (user_id)` using the Supabase SQL editor (as a privileged role) so those users can create **system_default** courses visible to every organization.
 
 If PostgREST returns **schema cache** errors for new columns, confirm the migration ran successfully; the API usually picks up DDL within about a minute. Re-run a trivial `notify pgrst, 'reload schema';` only if your project documents it (most projects auto-reload).
+
+**Sample LMS course:** `seed_norwegian_labour_law_leaders_course.sql` inserts a published **system_default** course *Norwegian Labour Law for Leaders* (fixed UUID) with all block types: executive summary, rich text, micro-lessons, flash cards, quizzes, on-the-job actions, checklist, reflection, and a video placeholder. Run after LMS migrations. Safe to re-run (deletes and re-inserts that course id).
