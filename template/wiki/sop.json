@@ -1,0 +1,22 @@
+{
+  "key": "sop",
+  "label": { "en": "Standard Operating Procedure", "nb": "Standard prosedyre" },
+  "document": {
+    "format": "blocks",
+    "blocks": [
+      {
+        "id": "b1",
+        "type": "text",
+        "content": "## Purpose\n\nDescribe why this procedure exists.\n\n## Scope\n\nWho and what this applies to.\n\n## Procedure\n\n1. Step one\n2. Step two\n\n## References\n\nLink related documents with [[related-page-slug]]."
+      },
+      {
+        "id": "b2",
+        "type": "callout",
+        "variant": "warning",
+        "title": "Safety",
+        "body": "Highlight critical safety or compliance notes here."
+      }
+    ],
+    "markdown": ""
+  }
+}

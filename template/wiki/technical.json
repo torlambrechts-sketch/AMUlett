@@ -1,0 +1,9 @@
+{
+  "key": "technical",
+  "label": { "en": "Technical documentation", "nb": "Teknisk dokumentasjon" },
+  "document": {
+    "format": "markdown",
+    "blocks": [],
+    "markdown": "## Overview\n\nShort summary of the system or component.\n\n## Architecture\n\n```\nDiagram or structure (use code block for ASCII)\n```\n\n## API / Configuration\n\n```typescript\n// Example\nconst x = 1;\n```\n\n## Related\n\nSee [[other-doc-slug]] for dependencies."
+  }
+}
