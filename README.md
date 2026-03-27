@@ -24,6 +24,8 @@ Apply the SQL migration `20250326210000_invitation_rpcs.sql` so `get_invitation_
 
 SQL migrations live in `supabase/migrations`. Apply them in the Supabase SQL editor or via the Supabase CLI. To run everything in one go, paste **`supabase/ALL_MIGRATIONS.sql`** into **SQL → New query** (anon keys cannot execute DDL).
 
+**LMS system courses:** migration `20250326220000_learning_lms.sql` adds `learning_courses.scope` (`system_default` vs `organization`) and `platform_admins`. Insert your user id into `platform_admins` (as postgres) to author default courses for all organizations.
+
 They define:
 
 - Organizations, invitations, JSON-localized roles and capabilities, and row level security

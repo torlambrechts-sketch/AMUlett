@@ -11,3 +11,5 @@ The **anon key cannot run migrations**; only the dashboard SQL editor or a role 
 ## Security
 
 Never commit service role keys or database passwords. Rotate keys if they are exposed.
+
+**Platform admins (LMS):** after `20250326220000_learning_lms.sql`, insert rows into `public.platform_admins (user_id)` using the Supabase SQL editor (as a privileged role) so those users can create **system_default** courses visible to every organization.
