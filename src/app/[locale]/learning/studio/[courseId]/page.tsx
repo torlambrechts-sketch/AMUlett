@@ -4,7 +4,8 @@ import { AppShell } from "@/components/layout/app-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { getLearningAccess } from "@/lib/learning/server-access";
-import { pickLocalizedJson } from "@/lib/learning/localize";
+import { resolveLocalized } from "@/lib/learning/localize";
+import { courseShellTitle } from "@/lib/learning/course-display";
 import { CourseEditor } from "@/components/learning/course-editor";
 import type { LearningModuleRow } from "@/lib/learning/types";
 
@@ -46,10 +47,14 @@ export default async function StudioCoursePage({ params }: Props) {
     .eq("course_id", courseId)
     .order("position", { ascending: true });
 
-  const title = pickLocalizedJson(course.title as Record<string, string>, locale) || course.slug;
+  const titleRes = resolveLocalized(course.title as Record<string, string>, locale);
+  const shell = courseShellTitle(titleRes, course.slug, {
+    notInThisLanguage: t("notAvailableInThisLanguage"),
+    shownInLanguage: (lang) => t("contentFromOtherLocale", { language: lang }),
+  });
 
   return (
-    <AppShell title={`${t("studioTitle")}: ${title}`}>
+    <AppShell title={`${t("studioTitle")}: ${shell.title}`} titleLocaleNote={shell.titleLocaleNote}>
       <CourseEditor
         course={{
           id: course.id,

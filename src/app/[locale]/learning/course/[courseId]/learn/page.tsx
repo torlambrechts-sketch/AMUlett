@@ -4,7 +4,8 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Link } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
-import { pickLocalizedJson } from "@/lib/learning/localize";
+import { resolveLocalized } from "@/lib/learning/localize";
+import { courseShellTitle } from "@/lib/learning/course-display";
 import { LearningBlockRenderer } from "@/components/blocks/learning/block-renderer";
 import { MarkSectionComplete } from "@/components/learning/mark-section-complete";
 import type { LearningBlockType } from "@/lib/learning/types";
@@ -39,10 +40,14 @@ export default async function CourseLearnPage({ params }: Props) {
     .eq("course_id", courseId)
     .order("position", { ascending: true });
 
-  const title = pickLocalizedJson(course.title as Record<string, string>, locale) || course.slug;
+  const titleRes = resolveLocalized(course.title as Record<string, string>, locale);
+  const shell = courseShellTitle(titleRes, course.slug, {
+    notInThisLanguage: t("notAvailableInThisLanguage"),
+    shownInLanguage: (lang) => t("contentFromOtherLocale", { language: lang }),
+  });
 
   return (
-    <AppShell title={title}>
+    <AppShell title={shell.title} titleLocaleNote={shell.titleLocaleNote}>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
         <Link href={`/learning/course/${courseId}`} className="text-sm text-[var(--color-primary)] hover:underline">
           {t("courseOverview")}

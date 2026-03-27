@@ -28,9 +28,12 @@ function displayNameFromEmail(email: string | null): string {
 
 export async function AppShell({
   title,
+  titleLocaleNote,
   children,
 }: {
   title: string;
+  /** Shown under the title when content is missing or shown in another language. */
+  titleLocaleNote?: string | null;
   children: React.ReactNode;
 }) {
   const t = await getTranslations("nav");
@@ -76,6 +79,9 @@ export async function AppShell({
               <h1 className="truncate text-sm font-semibold tracking-tight text-[var(--color-text)] sm:text-base lg:text-lg">
                 {title}
               </h1>
+              {titleLocaleNote ? (
+                <p className="mt-0.5 truncate text-xs text-amber-800 dark:text-amber-200/90">{titleLocaleNote}</p>
+              ) : null}
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">

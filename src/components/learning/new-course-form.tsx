@@ -104,10 +104,18 @@ export function NewCourseForm() {
       const baseSlug = slugFromCourseTitles(titleNb, titleEn);
       const slug = await pickUniqueSlug(supabase, baseSlug, scope, organizationId);
 
+      const title: Record<string, string> = {};
+      if (titleNb.trim()) title.nb = titleNb.trim();
+      if (titleEn.trim()) title.en = titleEn.trim();
+
+      const description: Record<string, string> = {};
+      if (descNb.trim()) description.nb = descNb.trim();
+      if (descEn.trim()) description.en = descEn.trim();
+
       const row = {
         slug,
-        title: { nb: titleNb.trim(), en: titleEn.trim() },
-        description: { nb: descNb.trim(), en: descEn.trim() },
+        title,
+        description,
         published: false,
         scope,
         organization_id: organizationId,
@@ -159,7 +167,7 @@ export function NewCourseForm() {
             placeholder={t("titleEnPlaceholder")}
           />
         </div>
-        <p className="text-xs text-[var(--color-text-muted)]">{t("titleEitherLocale")}</p>
+        <p className="text-xs text-[var(--color-text-muted)]">{t("titlesOptional")}</p>
         <div>
           <label className="mb-1 block text-sm font-medium">{t("fieldDescNb")}</label>
           <textarea

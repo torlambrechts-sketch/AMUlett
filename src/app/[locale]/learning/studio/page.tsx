@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { getLearningAccess } from "@/lib/learning/server-access";
-import { pickLocalizedJson } from "@/lib/learning/localize";
+import { StudioCourseListItem } from "@/components/learning/studio-course-list-item";
 import type { LearningCourseRow } from "@/lib/learning/types";
 
 export default async function LearningStudioPage() {
@@ -69,23 +69,17 @@ export default async function LearningStudioPage() {
           ) : (
             <ul className="space-y-2">
               {systemCourses.map((c) => (
-                <li
+                <StudioCourseListItem
                   key={c.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
-                >
-                  <div>
-                    <span className="text-xs text-[var(--color-primary)]">{t("badgeDefault")}</span>
-                    <p className="font-medium text-[var(--color-text)]">
-                      {pickLocalizedJson(c.title, locale) || c.slug}
-                    </p>
-                    <p className="text-xs text-[var(--color-text-muted)]">
-                      {c.published ? t("published") : t("draft")}
-                    </p>
-                  </div>
-                  <Link href={`/learning/studio/${c.id}`} className="text-sm font-medium text-[var(--color-primary)] hover:underline">
-                    {t("edit")}
-                  </Link>
-                </li>
+                  course={c}
+                  locale={locale}
+                  badge={t("badgeDefault")}
+                  badgeClassName="text-[var(--color-primary)]"
+                  publishedLabel={t("published")}
+                  draftLabel={t("draft")}
+                  editLabel={t("edit")}
+                  t={t}
+                />
               ))}
             </ul>
           )}
@@ -101,23 +95,17 @@ export default async function LearningStudioPage() {
         ) : (
           <ul className="space-y-2">
             {orgCourses.map((c) => (
-              <li
+              <StudioCourseListItem
                 key={c.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
-              >
-                <div>
-                  <span className="text-xs text-[var(--color-text-muted)]">{t("badgeCompany")}</span>
-                  <p className="font-medium text-[var(--color-text)]">
-                    {pickLocalizedJson(c.title, locale) || c.slug}
-                  </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    {c.published ? t("published") : t("draft")}
-                  </p>
-                </div>
-                <Link href={`/learning/studio/${c.id}`} className="text-sm font-medium text-[var(--color-primary)] hover:underline">
-                  {t("edit")}
-                </Link>
-              </li>
+                course={c}
+                locale={locale}
+                badge={t("badgeCompany")}
+                badgeClassName="text-[var(--color-text-muted)]"
+                publishedLabel={t("published")}
+                draftLabel={t("draft")}
+                editLabel={t("edit")}
+                t={t}
+              />
             ))}
           </ul>
         )}

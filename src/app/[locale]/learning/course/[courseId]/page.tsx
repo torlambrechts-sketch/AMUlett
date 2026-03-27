@@ -4,7 +4,9 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Link } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
-import { pickLocalizedJson } from "@/lib/learning/localize";
+import { resolveLocalized } from "@/lib/learning/localize";
+import { courseShellTitle } from "@/lib/learning/course-display";
+import { LocalizedParagraph } from "@/components/learning/localized-content";
 import { EnrollButton } from "@/components/learning/enroll-button";
 
 type Props = { params: Promise<{ courseId: string }> };
@@ -39,11 +41,21 @@ export default async function CourseDetailPage({ params }: Props) {
     .eq("course_id", courseId)
     .order("position", { ascending: true });
 
+  const titleRes = resolveLocalized(course.title as Record<string, string>, locale);
+  const descRes = resolveLocalized(course.description as Record<string, string>, locale);
+  const shell = courseShellTitle(titleRes, course.slug, {
+    notInThisLanguage: t("notAvailableInThisLanguage"),
+    shownInLanguage: (lang) => t("contentFromOtherLocale", { language: lang }),
+  });
+
   return (
-    <AppShell title={pickLocalizedJson(course.title as Record<string, string>, locale) || course.slug}>
-      <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">
-        {pickLocalizedJson(course.description as Record<string, string>, locale)}
-      </p>
+    <AppShell title={shell.title} titleLocaleNote={shell.titleLocaleNote}>
+      <LocalizedParagraph
+        resolved={descRes}
+        emptyMessage={t("notAvailableInThisLanguage")}
+        fallbackMessage={(lang) => t("contentFromOtherLocale", { language: lang })}
+        className="mb-6 max-w-2xl"
+      />
       <div className="mb-8 flex flex-wrap gap-3">
         <EnrollButton courseId={course.id} label={t("enroll")} />
         <Link

@@ -114,6 +114,10 @@
     "signOut": "Logg ut"
   },
   "lms": {
+    "notAvailableInThisLanguage": "Ikke tilgjengelig på dette språket.",
+    "contentFromOtherLocale": "Vist på {language} — ikke oversatt til gjeldende språk ennå.",
+    "localeName_nb": "norsk",
+    "localeName_en": "engelsk",
     "catalogTitle": "E-læring",
     "catalogIntro": "Standardkurs for alle organisasjoner vises først; organisasjonen kan legge til egne publiserte kurs under.",
     "openStudio": "Kursstudio",
@@ -149,7 +153,7 @@
     "backToStudio": "Studio",
     "slugAutoHint": "En kort kode til lenker lages automatisk fra tittelen. Du trenger ikke fylle den inn selv.",
     "titleRequired": "Fyll inn minst én tittel (norsk eller engelsk).",
-    "titleEitherLocale": "Du kan fylle ett eller begge språk; første tilgjengelige tittel brukes til lenken.",
+    "titlesOptional": "Tittel og beskrivelse er valgfritt per språk. Deltakere får en tydelig melding hvis noe mangler på språket de bruker.",
     "titleNbPlaceholder": "f.eks. Arbeidsmiljø for nye ledere",
     "titleEnPlaceholder": "f.eks. Work environment for new managers",
     "errorSchemaCache": "Databasen mangler siste LMS-endringer (f.eks. kolonnen scope). Kjør migrasjon 20250326220000_learning_lms.sql i Supabase SQL-editoren, vent et minutt og prøv igjen.",

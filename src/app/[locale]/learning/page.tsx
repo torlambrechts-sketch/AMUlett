@@ -4,8 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { fetchPublishedCatalog } from "@/lib/learning/catalog";
 import { getUserOrgContext } from "@/lib/org/server";
 import { getLearningAccess } from "@/lib/learning/server-access";
-import { pickLocalizedJson } from "@/lib/learning/localize";
-import { EnrollButton } from "@/components/learning/enroll-button";
+import { CatalogCourseCard } from "@/components/learning/catalog-course-card";
 
 export default async function LearningPage() {
   const t = await getTranslations("lms");
@@ -39,29 +38,14 @@ export default async function LearningPage() {
             ) : (
               <ul className="grid gap-4 sm:grid-cols-2">
                 {catalog.system.map((c) => (
-                  <li
+                  <CatalogCourseCard
                     key={c.id}
-                    className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-card)]"
-                  >
-                    <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-primary)]">
-                      {t("badgeDefault")}
-                    </p>
-                    <h3 className="mt-1 text-lg font-semibold text-[var(--color-text)]">
-                      {pickLocalizedJson(c.title, locale) || c.slug}
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--color-text-muted)] line-clamp-3">
-                      {pickLocalizedJson(c.description, locale)}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Link
-                        href={`/learning/course/${c.id}`}
-                        className="text-sm font-medium text-[var(--color-primary)] hover:underline"
-                      >
-                        {t("viewCourse")}
-                      </Link>
-                      <EnrollButton courseId={c.id} label={t("enroll")} />
-                    </div>
-                  </li>
+                    course={c}
+                    locale={locale}
+                    badge={t("badgeDefault")}
+                    badgeClassName="text-[var(--color-primary)]"
+                    t={t}
+                  />
                 ))}
               </ul>
             )}
@@ -74,29 +58,14 @@ export default async function LearningPage() {
             ) : (
               <ul className="grid gap-4 sm:grid-cols-2">
                 {catalog.organization.map((c) => (
-                  <li
+                  <CatalogCourseCard
                     key={c.id}
-                    className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-card)]"
-                  >
-                    <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
-                      {t("badgeCompany")}
-                    </p>
-                    <h3 className="mt-1 text-lg font-semibold text-[var(--color-text)]">
-                      {pickLocalizedJson(c.title, locale) || c.slug}
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--color-text-muted)] line-clamp-3">
-                      {pickLocalizedJson(c.description, locale)}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Link
-                        href={`/learning/course/${c.id}`}
-                        className="text-sm font-medium text-[var(--color-primary)] hover:underline"
-                      >
-                        {t("viewCourse")}
-                      </Link>
-                      <EnrollButton courseId={c.id} label={t("enroll")} />
-                    </div>
-                  </li>
+                    course={c}
+                    locale={locale}
+                    badge={t("badgeCompany")}
+                    badgeClassName="text-[var(--color-text-muted)]"
+                    t={t}
+                  />
                 ))}
               </ul>
             )}

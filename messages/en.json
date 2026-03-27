@@ -114,6 +114,10 @@
     "signOut": "Sign out"
   },
   "lms": {
+    "notAvailableInThisLanguage": "Not available in this language.",
+    "contentFromOtherLocale": "Shown in {language} — not translated for the current language yet.",
+    "localeName_nb": "Norwegian",
+    "localeName_en": "English",
     "catalogTitle": "Learning",
     "catalogIntro": "Default courses for every organization appear first; your company can add its own published courses below.",
     "openStudio": "Course studio",
@@ -149,7 +153,7 @@
     "backToStudio": "Studio",
     "slugAutoHint": "A short URL-friendly code is created automatically from your title. You do not need to type it.",
     "titleRequired": "Enter at least one title (Norwegian or English).",
-    "titleEitherLocale": "You can fill one or both languages; the first available title is used for the link.",
+    "titlesOptional": "Titles and descriptions are optional per language. Learners see a clear message if a field is missing in their language.",
     "titleNbPlaceholder": "e.g. Arbeidsmiljø for nye ledere",
     "titleEnPlaceholder": "e.g. Work environment for new managers",
     "errorSchemaCache": "The database is missing the latest LMS columns (for example scope). Run migration 20250326220000_learning_lms.sql in the Supabase SQL editor, then wait a minute and try again.",
