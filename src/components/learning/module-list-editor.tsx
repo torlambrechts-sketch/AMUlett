@@ -123,6 +123,7 @@ function SortableModuleCard({
       <JsonContentEditor
         key={mod.id}
         readOnly={readOnly}
+        moduleType={mod.module_type}
         content={mod.content}
         onChange={(c) => onContentChange(mod.id, c)}
         onSave={(c) => onContentSave(mod.id, c)}

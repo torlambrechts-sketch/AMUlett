@@ -8,6 +8,7 @@ import { parseWikiDocument, type WikiEditorDocument } from "@/lib/wiki/types";
 import { wikiDocumentToPlainText } from "@/lib/wiki/plain-text";
 import { WikiDocView } from "@/components/wiki/wiki-doc-view";
 import { WikiPresenceBar } from "@/components/wiki/wiki-presence";
+import { WikiBlocksEditor } from "@/components/editor/wiki-blocks-editor";
 import { resolveLocalized } from "@/lib/learning/localize";
 
 export function WikiPageEditor({
@@ -44,17 +45,19 @@ export function WikiPageEditor({
   selectedTagIds: string[];
 }) {
   const t = useTranslations("documents");
+  const te = useTranslations("editor");
   const router = useRouter();
 
-  const defaultDoc = useMemo(() => {
-    const d = parseWikiDocument(initialDocument);
-    return JSON.stringify(d, null, 2);
-  }, [initialDocument]);
+  const initialParsed = useMemo(() => parseWikiDocument(initialDocument), [initialDocument]);
+  const [doc, setDoc] = useState<WikiEditorDocument>(() => initialParsed);
+  const [jsonText, setJsonText] = useState(() => JSON.stringify(initialParsed, null, 2));
+  const [editorTab, setEditorTab] = useState<"visual" | "markdown" | "json">(() =>
+    initialParsed.format === "markdown" ? "markdown" : "visual"
+  );
 
   const [title, setTitle] = useState(
     () => initialTitle[locale] ?? Object.values(initialTitle).find(Boolean) ?? ""
   );
-  const [jsonText, setJsonText] = useState(defaultDoc);
   const [publishStatus, setPublishStatus] = useState(initialPublishStatus);
   const [reqAppr, setReqAppr] = useState(requiresApproval);
   const [revMonths, setRevMonths] = useState(initialReviewMonths != null ? String(initialReviewMonths) : "");
@@ -63,13 +66,34 @@ export function WikiPageEditor({
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const parsedDoc = useMemo(() => {
-    try {
-      return parseWikiDocument(JSON.parse(jsonText) as unknown);
-    } catch {
-      return parseWikiDocument({});
+  const parsedForPreview = useMemo(() => {
+    if (editorTab === "json") {
+      try {
+        return parseWikiDocument(JSON.parse(jsonText) as unknown);
+      } catch {
+        return doc;
+      }
     }
-  }, [jsonText]);
+    return doc;
+  }, [doc, editorTab, jsonText]);
+
+  function syncDocFromJson() {
+    try {
+      const next = parseWikiDocument(JSON.parse(jsonText) as unknown);
+      setDoc(next);
+      setMsg(null);
+      return next;
+    } catch {
+      setMsg(t("invalidJson"));
+      return null;
+    }
+  }
+
+  function setBlocksFormat(nextBlocks: WikiEditorDocument["blocks"]) {
+    const next: WikiEditorDocument = { format: "blocks", blocks: nextBlocks, markdown: "" };
+    setDoc(next);
+    setJsonText(JSON.stringify(next, null, 2));
+  }
 
   async function persistTags(supabase: ReturnType<typeof createSupabaseBrowserClient>) {
     await supabase.from("wiki_page_tags").delete().eq("page_id", pageId);
@@ -111,16 +135,19 @@ export function WikiPageEditor({
       return;
     }
 
-    let doc: WikiEditorDocument;
-    try {
-      doc = parseWikiDocument(JSON.parse(jsonText) as unknown);
-    } catch {
-      setMsg(t("invalidJson"));
-      setBusy(false);
-      return;
+    let finalDoc: WikiEditorDocument;
+    if (editorTab === "json") {
+      const parsed = syncDocFromJson();
+      if (!parsed) {
+        setBusy(false);
+        return;
+      }
+      finalDoc = parsed;
+    } else {
+      finalDoc = doc;
     }
 
-    const bodyPlain = wikiDocumentToPlainText(doc);
+    const bodyPlain = wikiDocumentToPlainText(finalDoc);
     const titleJson = { ...initialTitle };
     if (title.trim()) titleJson[locale] = title.trim();
 
@@ -138,7 +165,7 @@ export function WikiPageEditor({
       .insert({
         page_id: pageId,
         version: nextVersion,
-        editor_document: doc as unknown as Record<string, unknown>,
+        editor_document: finalDoc as unknown as Record<string, unknown>,
         body_plain: bodyPlain,
         revision_summary: action === "publish" ? "Publish" : "Draft save",
         created_by: user.id,
@@ -255,20 +282,72 @@ export function WikiPageEditor({
         {msg ? <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{msg}</p> : null}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div>
-          <label className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">{t("documentJson")}</label>
-          <textarea
-            value={jsonText}
-            onChange={(e) => setJsonText(e.target.value)}
-            rows={22}
-            className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2 font-mono text-xs"
-          />
+      <div className="flex flex-wrap gap-2 border-b border-[var(--color-border)] pb-2">
+        {doc.format === "blocks" ? (
+          <button
+            type="button"
+            className={`rounded px-3 py-1.5 text-xs font-medium ${editorTab === "visual" ? "bg-[var(--color-primary)] text-[var(--color-primary-fg)]" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]"}`}
+            onClick={() => setEditorTab("visual")}
+          >
+            {te("visualEditor")}
+          </button>
+        ) : null}
+        {doc.format === "markdown" ? (
+          <button
+            type="button"
+            className={`rounded px-3 py-1.5 text-xs font-medium ${editorTab === "markdown" ? "bg-[var(--color-primary)] text-[var(--color-primary-fg)]" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]"}`}
+            onClick={() => setEditorTab("markdown")}
+          >
+            {te("markdownEditor")}
+          </button>
+        ) : null}
+        <button
+          type="button"
+          className={`rounded px-3 py-1.5 text-xs font-medium ${editorTab === "json" ? "bg-[var(--color-primary)] text-[var(--color-primary-fg)]" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]"}`}
+          onClick={() => setEditorTab("json")}
+        >
+          {te("jsonEditor")}
+        </button>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(0,380px)]">
+        <div className="min-w-0 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4">
+          {editorTab === "visual" && doc.format === "blocks" ? (
+            <WikiBlocksEditor blocks={doc.blocks} onChange={(blocks) => setBlocksFormat(blocks)} readOnly={false} />
+          ) : null}
+
+          {editorTab === "markdown" ? (
+            <div>
+              <p className="mb-2 text-xs text-[var(--color-text-muted)]">{te("markdownFullPage")}</p>
+              <textarea
+                className="min-h-[280px] w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 font-mono text-sm"
+                value={doc.format === "markdown" ? doc.markdown : ""}
+                onChange={(e) => {
+                  const next: WikiEditorDocument = { format: "markdown", blocks: [], markdown: e.target.value };
+                  setDoc(next);
+                  setJsonText(JSON.stringify(next, null, 2));
+                }}
+              />
+              <p className="mt-2 text-xs text-[var(--color-text-muted)]">{te("wikiLinkHint")}</p>
+            </div>
+          ) : null}
+
+          {editorTab === "json" ? (
+            <div>
+              <textarea
+                value={jsonText}
+                onChange={(e) => setJsonText(e.target.value)}
+                rows={24}
+                className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 font-mono text-xs"
+              />
+            </div>
+          ) : null}
         </div>
+
         <div>
           <p className="mb-2 text-xs font-medium text-[var(--color-text-muted)]">{t("preview")}</p>
-          <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-            <WikiDocView editorDocument={parsedDoc} spaceSlug={spaceSlug} />
+          <div className="max-h-[min(70vh,560px)] overflow-y-auto rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+            <WikiDocView editorDocument={parsedForPreview} spaceSlug={spaceSlug} />
           </div>
         </div>
       </div>

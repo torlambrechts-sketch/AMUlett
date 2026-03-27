@@ -71,6 +71,7 @@ export default async function WikiPageEdit({ params }: Props) {
       </div>
 
       <WikiPageEditor
+        key={`${page.id}-${rev?.id ?? "new"}`}
         spaceSlug={spaceSlug}
         pageId={page.id}
         pageSlug={page.slug}
