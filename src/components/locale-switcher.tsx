@@ -13,7 +13,7 @@ export function LocaleSwitcher() {
     <label className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
       <span className="sr-only">Language</span>
       <select
-        className="h-9 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-2 text-sm text-[var(--color-text)]"
+        className="h-9 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text)] shadow-sm"
         value={locale}
         onChange={(e) => {
           router.replace(pathname, { locale: e.target.value });

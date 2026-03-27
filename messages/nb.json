@@ -1,5 +1,8 @@
 {
   "nav": {
+    "createNew": "Opprett ny",
+    "helpCenter": "Hjelpesenter",
+    "notifications": "Varsler",
     "sidebarHint": "Samsvarsarbeid — roller og data fra organisasjonen din.",
     "searchPlaceholder": "Søk…",
     "home": "Hjem",
@@ -15,6 +18,19 @@
   "dashboard": {
     "title": "Oversikt etter arbeidsmiljøloven",
     "intro": "Hvert område under støtter plikter etter arbeidsmiljøloven og tilhørende regler. Tekster, roller og organisasjonsdata ligger i databasen og Supabase-policyer—ikke hardkodet i koden.",
+    "overviewTitle": "Oversikt",
+    "overviewPlaceholder": "Diagrammer og status vises her når modulene er koblet til.",
+    "getStartedTitle": "Kom i gang",
+    "quickTaskTitle": "Oppgaver og oppfølging",
+    "quickTaskDesc": "Følg lovpålagte plikter, frister og sjekklister.",
+    "quickInviteTitle": "Inviter kollega",
+    "quickInviteDesc": "Send invitasjon med rolle fra organisasjonsinnstillinger.",
+    "openModule": "Åpne",
+    "pendingTitle": "Ventende",
+    "pendingEmpty": "Ingen ventende punkter. Oppgaver og signeringer vises her når de finnes.",
+    "recentTitle": "Nylig aktivitet",
+    "recentEmpty": "Ingen nylig aktivitet ennå.",
+    "seeAll": "Se alle",
     "modules": {
       "tasks": "Oppgaver og sjekklister",
       "tasksDesc": "Oppfølging, frister og dokumentasjon av statlige og interne krav.",

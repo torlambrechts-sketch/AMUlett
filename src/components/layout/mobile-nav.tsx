@@ -33,16 +33,16 @@ export function MobileNav() {
         <div className="fixed inset-0 z-50 lg:hidden" id="mobile-drawer">
           <button
             type="button"
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/50"
             aria-label="Close menu"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute left-0 top-0 flex h-full w-[min(100%,280px)] flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg">
-            <div className="flex items-center justify-between border-b border-[var(--color-border)] px-3 py-3">
-              <span className="text-sm font-semibold text-[var(--color-text)]">AMUlett</span>
+          <div className="absolute left-0 top-0 flex h-full w-[min(100%,288px)] flex-col bg-[var(--sidebar-bg)] shadow-xl">
+            <div className="flex items-center justify-between border-b border-[var(--sidebar-border)] px-4 py-3">
+              <span className="text-base font-semibold text-white">AMUlett</span>
               <button
                 type="button"
-                className="rounded-[var(--radius-sm)] p-2 text-[var(--color-text-muted)] hover:bg-[var(--color-bg)]"
+                className="rounded-[var(--radius-sm)] p-2 text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover)]"
                 aria-label="Close"
                 onClick={() => setOpen(false)}
               >
@@ -51,9 +51,11 @@ export function MobileNav() {
                 </svg>
               </button>
             </div>
-            <SidebarNav onNavigate={() => setOpen(false)} />
-            <div className="border-t border-[var(--color-border)] p-4">
-              <SignOutButton />
+            <div className="flex-1 overflow-y-auto py-2">
+              <SidebarNav onNavigate={() => setOpen(false)} />
+            </div>
+            <div className="border-t border-[var(--sidebar-border)] p-4">
+              <SignOutButton variant="sidebar" />
             </div>
           </div>
         </div>

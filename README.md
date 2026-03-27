@@ -36,7 +36,7 @@ New users can call the `bootstrap_user_organization` RPC once to create their fi
 
 Design tokens are CSS variables in `src/app/globals.css`: semantic colors, radii, and focus rings. Prefer these over ad hoc hex values. Keep copy in `messages/*.json` or in the database—not in React components.
 
-The shell layout (sidebar, top bar, teal accent, Inter) is aligned with the public **TeamHub – HR Management Dashboard** Figma reference; swap token values if your file uses different variables.
+The shell uses a **dark navy sidebar**, **blue primary actions**, **white top bar** with a generic **AMUlett** logo mark, and a **card-based dashboard** layout inspired by common document/HR dashboards. Design tokens live in `src/app/globals.css`.
 
 ## Deploy
 

@@ -1,5 +1,8 @@
 {
   "nav": {
+    "createNew": "Create new",
+    "helpCenter": "Help center",
+    "notifications": "Notifications",
     "sidebarHint": "Compliance workspace — roles and data from your organization.",
     "searchPlaceholder": "Search…",
     "home": "Home",
@@ -15,6 +18,19 @@
   "dashboard": {
     "title": "Compliance overview",
     "intro": "Each area below maps to obligations under the Working Environment Act and related rules. Configuration, copy, and permissions live in the database and Supabase policies—not in the application code.",
+    "overviewTitle": "Overview",
+    "overviewPlaceholder": "Activity and status charts will appear here when modules are connected.",
+    "getStartedTitle": "Get started",
+    "quickTaskTitle": "Tasks & follow-up",
+    "quickTaskDesc": "Track statutory duties, deadlines, and checklists.",
+    "quickInviteTitle": "Invite a colleague",
+    "quickInviteDesc": "Send an invitation with a role from organization settings.",
+    "openModule": "Open",
+    "pendingTitle": "Pending items",
+    "pendingEmpty": "No pending items. Tasks and signatures will show here when available.",
+    "recentTitle": "Recent activity",
+    "recentEmpty": "No recent activity yet.",
+    "seeAll": "See all",
     "modules": {
       "tasks": "Tasks & checklists",
       "tasksDesc": "Follow-up actions, deadlines, and evidence for statutory duties.",
