@@ -10,14 +10,21 @@ import { ExecutiveSummaryView } from "@/components/blocks/learning/executive-sum
 import { OnTheJobView } from "@/components/blocks/learning/on-the-job-view";
 import { ReflectionView } from "@/components/blocks/learning/reflection-view";
 import { ChecklistView } from "@/components/blocks/learning/checklist-view";
+import { PdfView } from "@/components/blocks/learning/pdf-view";
+import { ScormXapiView } from "@/components/blocks/learning/scorm-xapi-view";
+import { H5pView } from "@/components/blocks/learning/h5p-view";
+import { AssignmentBlockView } from "@/components/blocks/learning/assignment-block-view";
+import { ForumBlockView } from "@/components/blocks/learning/forum-block-view";
 
 export function LearningBlockRenderer({
   type,
   content,
+  courseId,
   onQuizComplete,
 }: {
   type: LearningBlockType;
   content: Record<string, unknown>;
+  courseId?: string;
   onQuizComplete?: (scorePercent: number) => void;
 }) {
   switch (type) {
@@ -43,6 +50,16 @@ export function LearningBlockRenderer({
       return <ReflectionView content={content as never} />;
     case "checklist":
       return <ChecklistView content={content as never} />;
+    case "pdf":
+      return <PdfView content={content as never} />;
+    case "scorm_xapi":
+      return <ScormXapiView content={content as never} />;
+    case "h5p":
+      return <H5pView content={content as never} />;
+    case "assignment":
+      return <AssignmentBlockView content={content as never} />;
+    case "forum":
+      return courseId ? <ForumBlockView courseId={courseId} content={content as never} /> : <p className="text-sm text-[var(--color-text-muted)]">Forum</p>;
     default:
       return <p className="text-sm text-[var(--color-text-muted)]">Unsupported block.</p>;
   }

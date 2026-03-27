@@ -24,7 +24,7 @@ export default async function StudioCoursePage({ params }: Props) {
 
   const { data: course } = await supabase
     .from("learning_courses")
-    .select("id, slug, title, description, published, scope, organization_id")
+    .select("id, slug, title, description, published, scope, organization_id, course_settings")
     .eq("id", courseId)
     .maybeSingle();
 
@@ -51,9 +51,19 @@ export default async function StudioCoursePage({ params }: Props) {
 
   const { data: modRows } = await supabase
     .from("learning_modules")
-    .select("id, course_id, position, module_type, content")
+    .select("id, course_id, position, module_type, content, release_rule")
     .eq("course_id", courseId)
     .order("position", { ascending: true });
+
+  let siblingCourses: { id: string; slug: string; title: Record<string, string> | null }[] = [];
+  if (course.scope === "organization" && course.organization_id && canEditOrg) {
+    const { data: sibs } = await supabase
+      .from("learning_courses")
+      .select("id, slug, title")
+      .eq("scope", "organization")
+      .eq("organization_id", course.organization_id);
+    siblingCourses = (sibs ?? []) as typeof siblingCourses;
+  }
 
   const titleRes = resolveLocalized(course.title as Record<string, string>, locale);
   const shell = courseShellTitle(titleRes, course.slug, {
@@ -65,6 +75,9 @@ export default async function StudioCoursePage({ params }: Props) {
     <AppShell title={`${t("studioTitle")}: ${shell.title}`} titleLocaleNote={shell.titleLocaleNote}>
       <CourseEditor
         readOnly={readOnly}
+        organizationId={course.organization_id}
+        siblingCourses={siblingCourses}
+        locale={locale}
         course={{
           id: course.id,
           slug: course.slug,
@@ -72,6 +85,7 @@ export default async function StudioCoursePage({ params }: Props) {
           scope: course.scope,
           title: (course.title as Record<string, string>) ?? {},
           description: (course.description as Record<string, string>) ?? {},
+          course_settings: (course.course_settings as Record<string, unknown>) ?? {},
         }}
         initialModules={(modRows ?? []) as LearningModuleRow[]}
       />

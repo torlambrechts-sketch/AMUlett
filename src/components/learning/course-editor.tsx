@@ -2,12 +2,13 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/navigation";
 import { LEARNING_BLOCK_TYPES, type LearningBlockType, type LearningModuleRow } from "@/lib/learning/types";
 import { defaultContentForType } from "@/lib/learning/default-content";
-import { LearningBlockRenderer } from "@/components/blocks/learning/block-renderer";
+import { ModuleListEditor } from "@/components/learning/module-list-editor";
+import { pickLocalizedJson } from "@/lib/learning/localize";
 
 type CourseMeta = {
   id: string;
@@ -16,17 +17,25 @@ type CourseMeta = {
   scope: string;
   title: Record<string, string>;
   description: Record<string, string>;
+  course_settings?: Record<string, unknown> | null;
 };
+
+type SiblingCourse = { id: string; slug: string; title: Record<string, string> | null };
 
 export function CourseEditor({
   course,
   initialModules,
   readOnly = false,
+  organizationId,
+  siblingCourses = [],
+  locale = "en",
 }: {
   course: CourseMeta;
   initialModules: LearningModuleRow[];
-  /** Published system_default course: export and preview only (org authors). */
   readOnly?: boolean;
+  organizationId?: string | null;
+  siblingCourses?: SiblingCourse[];
+  locale?: string;
 }) {
   const t = useTranslations("lms");
   const router = useRouter();
@@ -35,22 +44,80 @@ export function CourseEditor({
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [jsonText, setJsonText] = useState("");
+  const [settings, setSettings] = useState<Record<string, unknown>>(course.course_settings ?? {});
+  const [prereqIds, setPrereqIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!organizationId || course.scope !== "organization" || readOnly) return;
+    let cancelled = false;
+    (async () => {
+      const supabase = createSupabaseBrowserClient();
+      const { data } = await supabase
+        .from("learning_course_prerequisites")
+        .select("prerequisite_course_id")
+        .eq("course_id", course.id);
+      if (!cancelled && data) setPrereqIds(data.map((r) => r.prerequisite_course_id as string));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [course.id, course.scope, organizationId, readOnly]);
 
   const exportPayload = useMemo(
     () => ({
-      version: 1,
+      version: 2,
       slug: course.slug,
       title: course.title,
       description: course.description,
       scope: course.scope,
-      modules: modules.map((m) => ({ position: m.position, module_type: m.module_type, content: m.content })),
+      course_settings: settings,
+      modules: modules.map((m) => ({
+        position: m.position,
+        module_type: m.module_type,
+        content: m.content,
+        release_rule: m.release_rule ?? {},
+      })),
     }),
-    [course, modules]
+    [course, modules, settings]
   );
 
   const refresh = useCallback(() => {
     router.refresh();
   }, [router]);
+
+  async function saveCourseSettings() {
+    if (readOnly) return;
+    setSaving(true);
+    setMsg(null);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase.from("learning_courses").update({ course_settings: settings }).eq("id", course.id);
+      if (error) setMsg(error.message);
+      else setMsg(t("settingsSaved"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function savePrerequisites() {
+    if (readOnly || !organizationId || course.scope !== "organization") return;
+    setSaving(true);
+    setMsg(null);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      await supabase.from("learning_course_prerequisites").delete().eq("course_id", course.id);
+      if (prereqIds.length) {
+        const rows = prereqIds.map((pid) => ({ course_id: course.id, prerequisite_course_id: pid }));
+        const { error } = await supabase.from("learning_course_prerequisites").insert(rows);
+        if (error) setMsg(error.message);
+        else setMsg(t("prerequisitesSaved"));
+      } else {
+        setMsg(t("prerequisitesSaved"));
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function saveMeta(nextPublished: boolean) {
     setSaving(true);
@@ -85,8 +152,9 @@ export function CourseEditor({
           position: nextPos,
           module_type: type,
           content,
+          release_rule: {},
         })
-        .select("id, course_id, position, module_type, content")
+        .select("id, course_id, position, module_type, content, release_rule")
         .single();
       if (error) setMsg(error.message);
       else if (data) setModules((m) => [...m, data as LearningModuleRow]);
@@ -103,27 +171,6 @@ export function CourseEditor({
       const { error } = await supabase.from("learning_modules").delete().eq("id", id);
       if (error) setMsg(error.message);
       else setModules((m) => m.filter((x) => x.id !== id));
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function moveBlock(id: string, dir: -1 | 1) {
-    const idx = modules.findIndex((m) => m.id === id);
-    const j = idx + dir;
-    if (idx < 0 || j < 0 || j >= modules.length) return;
-    const next = [...modules];
-    const tmp = next[idx]!.position;
-    next[idx]!.position = next[j]!.position;
-    next[j]!.position = tmp;
-    next.sort((a, b) => a.position - b.position);
-    setModules(next);
-    setSaving(true);
-    try {
-      const supabase = createSupabaseBrowserClient();
-      await supabase.from("learning_modules").update({ position: next[idx]!.position }).eq("id", next[idx]!.id);
-      await supabase.from("learning_modules").update({ position: next[j]!.position }).eq("id", next[j]!.id);
-      setMsg(t("orderSaved"));
     } finally {
       setSaving(false);
     }
@@ -150,7 +197,12 @@ export function CourseEditor({
     setMsg(null);
     try {
       const parsed = JSON.parse(jsonText) as {
-        modules?: { position: number; module_type: string; content: Record<string, unknown> }[];
+        modules?: {
+          position: number;
+          module_type: string;
+          content: Record<string, unknown>;
+          release_rule?: Record<string, unknown>;
+        }[];
       };
       if (!parsed.modules?.length) {
         setMsg(t("importInvalid"));
@@ -164,8 +216,12 @@ export function CourseEditor({
         position: mod.position ?? i,
         module_type: mod.module_type,
         content: mod.content ?? {},
+        release_rule: mod.release_rule ?? {},
       }));
-      const { data, error } = await supabase.from("learning_modules").insert(rows).select("id, course_id, position, module_type, content");
+      const { data, error } = await supabase
+        .from("learning_modules")
+        .insert(rows)
+        .select("id, course_id, position, module_type, content, release_rule");
       if (error) setMsg(error.message);
       else setModules((data ?? []) as LearningModuleRow[]);
     } catch {
@@ -174,6 +230,10 @@ export function CourseEditor({
       setSaving(false);
     }
   }
+
+  const prereqOptions = siblingCourses.filter((c) => c.id !== course.id);
+  const gamification = Boolean(settings.gamificationEnabled);
+  const certMonths = typeof settings.certRecertMonths === "number" ? settings.certRecertMonths : "";
 
   return (
     <div className="space-y-8">
@@ -185,6 +245,17 @@ export function CourseEditor({
         <Link href={`/learning/course/${course.id}`} className="text-sm text-[var(--color-text-muted)] hover:underline">
           {t("previewCatalog")}
         </Link>
+        {!readOnly && organizationId ? (
+          <>
+            <span className="text-[var(--color-text-muted)]">|</span>
+            <Link
+              href="/learning/studio/resources"
+              className="text-sm text-[var(--color-primary)] hover:underline"
+            >
+              {t("resourceLibrary")}
+            </Link>
+          </>
+        ) : null}
       </div>
 
       {readOnly ? (
@@ -194,9 +265,7 @@ export function CourseEditor({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-        <span className="text-sm text-[var(--color-text)]">
-          {published ? t("published") : t("draft")}
-        </span>
+        <span className="text-sm text-[var(--color-text)]">{published ? t("published") : t("draft")}</span>
         {!readOnly ? (
           <>
             <button
@@ -230,6 +299,77 @@ export function CourseEditor({
 
       {msg ? <p className="text-sm text-[var(--color-text-secondary)]">{msg}</p> : null}
 
+      {!readOnly && course.scope === "organization" && organizationId ? (
+        <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <h3 className="mb-2 text-sm font-semibold">{t("courseSettingsTitle")}</h3>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={gamification}
+                onChange={(e) => setSettings((s) => ({ ...s, gamificationEnabled: e.target.checked }))}
+              />
+              {t("gamificationEnabled")}
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <span className="text-[var(--color-text-muted)]">{t("certRecertMonths")}</span>
+              <input
+                type="number"
+                min={0}
+                className="w-20 rounded border border-[var(--color-border)] px-2 py-1 text-sm"
+                value={certMonths === "" ? "" : String(certMonths)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setSettings((s) => ({
+                    ...s,
+                    certRecertMonths: v === "" ? undefined : parseInt(v, 10),
+                  }));
+                }}
+              />
+            </label>
+            <button
+              type="button"
+              onClick={saveCourseSettings}
+              disabled={saving}
+              className="rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1.5 text-sm disabled:opacity-50"
+            >
+              {t("saveSettings")}
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {!readOnly && course.scope === "organization" && prereqOptions.length > 0 ? (
+        <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <h3 className="mb-2 text-sm font-semibold">{t("prerequisitesTitle")}</h3>
+          <p className="mb-3 text-xs text-[var(--color-text-muted)]">{t("prerequisitesHelp")}</p>
+          <div className="max-h-40 space-y-2 overflow-y-auto">
+            {prereqOptions.map((c) => (
+              <label key={c.id} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={prereqIds.includes(c.id)}
+                  onChange={(e) => {
+                    setPrereqIds((ids) =>
+                      e.target.checked ? [...ids, c.id] : ids.filter((x) => x !== c.id)
+                    );
+                  }}
+                />
+                <span>{pickLocalizedJson(c.title, locale) || c.slug}</span>
+              </label>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={savePrerequisites}
+            disabled={saving}
+            className="mt-3 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-[var(--color-primary-fg)] disabled:opacity-50"
+          >
+            {t("savePrerequisites")}
+          </button>
+        </section>
+      ) : null}
+
       <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
         <h3 className="mb-2 text-sm font-semibold">{t("importExport")}</h3>
         <textarea
@@ -254,7 +394,8 @@ export function CourseEditor({
 
       {!readOnly ? (
         <section>
-          <h3 className="mb-3 text-sm font-semibold">{t("addSection")}</h3>
+          <h3 className="mb-2 text-sm font-semibold">{t("dragDropHint")}</h3>
+          <h4 className="mb-3 text-sm font-semibold">{t("addSection")}</h4>
           <div className="flex flex-wrap gap-2">
             {LEARNING_BLOCK_TYPES.map((type) => (
               <button
@@ -271,98 +412,15 @@ export function CourseEditor({
         </section>
       ) : null}
 
-      <div className="space-y-6">
-        {modules.map((mod, idx) => (
-          <div key={mod.id} className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-card)]">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] pb-2">
-              <span className="text-sm font-medium capitalize text-[var(--color-text)]">
-                {mod.module_type.replace(/_/g, " ")} · #{idx + 1}
-              </span>
-              {!readOnly ? (
-                <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={() => moveBlock(mod.id, -1)} className="text-xs text-[var(--color-primary)]">
-                    ↑
-                  </button>
-                  <button type="button" onClick={() => moveBlock(mod.id, 1)} className="text-xs text-[var(--color-primary)]">
-                    ↓
-                  </button>
-                  <button type="button" onClick={() => removeBlock(mod.id)} className="text-xs text-red-600">
-                    {t("remove")}
-                  </button>
-                </div>
-              ) : null}
-            </div>
-            <JsonContentEditor
-              key={mod.id}
-              readOnly={readOnly}
-              content={mod.content}
-              onChange={(c) => updateLocalContent(mod.id, c)}
-              onSave={(c) => persistContent(mod.id, c)}
-            />
-            <div className="mt-4 border-t border-[var(--color-border)] pt-4">
-              <p className="mb-2 text-xs text-[var(--color-text-muted)]">{t("preview")}</p>
-              <LearningBlockRenderer type={mod.module_type} content={mod.content} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function JsonContentEditor({
-  content,
-  onChange,
-  onSave,
-  readOnly = false,
-}: {
-  content: Record<string, unknown>;
-  onChange: (c: Record<string, unknown>) => void;
-  onSave: (c: Record<string, unknown>) => void;
-  readOnly?: boolean;
-}) {
-  const t = useTranslations("lms");
-  const [text, setText] = useState(() => JSON.stringify(content, null, 2));
-  const [err, setErr] = useState<string | null>(null);
-
-  return (
-    <div>
-      <label className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">{t("contentJson")}</label>
-      <textarea
-        value={text}
+      <ModuleListEditor
+        courseId={course.id}
+        modules={modules}
+        setModules={setModules}
         readOnly={readOnly}
-        onChange={(e) => {
-          if (readOnly) return;
-          setText(e.target.value);
-          setErr(null);
-          try {
-            onChange(JSON.parse(e.target.value) as Record<string, unknown>);
-          } catch {
-            /* invalid while typing */
-          }
-        }}
-        rows={8}
-        className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2 font-mono text-xs read-only:opacity-90"
+        onRemove={removeBlock}
+        onContentChange={updateLocalContent}
+        onContentSave={persistContent}
       />
-      {err ? <p className="text-xs text-red-600">{err}</p> : null}
-      {!readOnly ? (
-        <button
-          type="button"
-          className="mt-2 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1 text-xs"
-          onClick={() => {
-            try {
-              const c = JSON.parse(text) as Record<string, unknown>;
-              onChange(c);
-              void onSave(c);
-              setErr(null);
-            } catch {
-              setErr("Invalid JSON");
-            }
-          }}
-        >
-          {t("saveContent")}
-        </button>
-      ) : null}
     </div>
   );
 }

@@ -41,6 +41,16 @@ export function defaultContentForType(type: LearningBlockType): Record<string, u
       return { prompt: "" };
     case "checklist":
       return { items: [{ id: rid(), label: "" }] };
+    case "pdf":
+      return { url: "", title: "" };
+    case "scorm_xapi":
+      return { packageType: "SCORM 1.2", launchUrl: "", notes: "" };
+    case "h5p":
+      return { title: "", embedUrl: "" };
+    case "assignment":
+      return { title: "Assignment", instructions: "", acceptUpload: true };
+    case "forum":
+      return { headline: "Discuss this lesson" };
     default:
       return {};
   }

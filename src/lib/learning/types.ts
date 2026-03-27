@@ -11,6 +11,11 @@ export const LEARNING_BLOCK_TYPES = [
   "on_the_job",
   "reflection",
   "checklist",
+  "pdf",
+  "scorm_xapi",
+  "h5p",
+  "assignment",
+  "forum",
 ] as const;
 
 export type LearningBlockType = (typeof LEARNING_BLOCK_TYPES)[number];
@@ -26,6 +31,7 @@ export type LearningCourseRow = {
   published: boolean;
   scope: CourseScope;
   created_at: string;
+  course_settings?: Record<string, unknown> | null;
 };
 
 export type LearningModuleRow = {
@@ -34,6 +40,7 @@ export type LearningModuleRow = {
   position: number;
   module_type: LearningBlockType;
   content: Record<string, unknown>;
+  release_rule?: Record<string, unknown> | null;
 };
 
 export type RichTextContent = {
@@ -48,15 +55,31 @@ export type ShortMessageContent = {
   message?: string;
 };
 
+export type QuizQuestionType = "multiple_choice" | "multi_select" | "open_ended" | "matching";
+
 export type QuizQuestion = {
   id: string;
+  type?: QuizQuestionType;
   question: string;
-  choices: { id: string; label: string }[];
-  correctChoiceId: string;
+  /** Multiple choice */
+  choices?: { id: string; label: string }[];
+  correctChoiceId?: string;
+  /** Multi select */
+  correctChoiceIds?: string[];
+  /** Open ended */
+  sampleAnswer?: string;
+  /** Matching */
+  leftColumn?: { id: string; label: string }[];
+  rightColumn?: { id: string; label: string }[];
+  correctPairs?: { leftId: string; rightId: string }[];
 };
 
 export type QuizContent = {
   questions?: QuizQuestion[];
+  /** Pool for random selection */
+  questionBank?: QuizQuestion[];
+  /** How many questions to draw from bank (shuffled) */
+  randomCount?: number;
   passPercent?: number;
 };
 

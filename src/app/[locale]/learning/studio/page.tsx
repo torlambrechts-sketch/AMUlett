@@ -64,13 +64,21 @@ export default async function LearningStudioPage() {
   return (
     <AppShell title={t("studioTitle")}>
       <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("studioIntro")}</p>
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap gap-3">
         <Link
           href="/learning/studio/new"
           className="inline-flex rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-primary-fg)]"
         >
           {t("newCourse")}
         </Link>
+        {(access.canAuthorOrg || access.isPlatformAdmin) && (
+          <Link
+            href="/learning/studio/resources"
+            className="inline-flex rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-2 text-sm font-semibold text-[var(--color-text)]"
+          >
+            {t("resourceLibrary")}
+          </Link>
+        )}
       </div>
 
       {access.isPlatformAdmin ? (
