@@ -5,11 +5,11 @@ import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/navigation";
+import { slugFromCourseTitles } from "@/lib/learning/slug";
 
 export function NewCourseForm() {
   const t = useTranslations("lms");
   const router = useRouter();
-  const [slug, setSlug] = useState("");
   const [titleNb, setTitleNb] = useState("");
   const [titleEn, setTitleEn] = useState("");
   const [descNb, setDescNb] = useState("");
@@ -17,6 +17,46 @@ export function NewCourseForm() {
   const [scope, setScope] = useState<"organization" | "system_default">("organization");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  async function slugExists(
+    supabase: ReturnType<typeof createSupabaseBrowserClient>,
+    slug: string,
+    orgScope: "organization" | "system_default",
+    organizationId: string | null
+  ): Promise<boolean> {
+    if (orgScope === "system_default") {
+      const { data } = await supabase
+        .from("learning_courses")
+        .select("id")
+        .eq("scope", "system_default")
+        .eq("slug", slug)
+        .maybeSingle();
+      return !!data;
+    }
+    const { data } = await supabase
+      .from("learning_courses")
+      .select("id")
+      .eq("scope", "organization")
+      .eq("organization_id", organizationId!)
+      .eq("slug", slug)
+      .maybeSingle();
+    return !!data;
+  }
+
+  async function pickUniqueSlug(
+    supabase: ReturnType<typeof createSupabaseBrowserClient>,
+    base: string,
+    orgScope: "organization" | "system_default",
+    organizationId: string | null
+  ): Promise<string> {
+    let candidate = base;
+    for (let n = 0; n < 50; n++) {
+      const exists = await slugExists(supabase, candidate, orgScope, organizationId);
+      if (!exists) return candidate;
+      candidate = `${base}-${n + 2}`;
+    }
+    return `${base}-${Math.random().toString(36).slice(2, 8)}`;
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,10 +95,19 @@ export function NewCourseForm() {
         }
       }
 
+      if (!titleNb.trim() && !titleEn.trim()) {
+        setErr(t("titleRequired"));
+        setLoading(false);
+        return;
+      }
+
+      const baseSlug = slugFromCourseTitles(titleNb, titleEn);
+      const slug = await pickUniqueSlug(supabase, baseSlug, scope, organizationId);
+
       const row = {
-        slug: slug.trim().toLowerCase().replace(/\s+/g, "-"),
-        title: { nb: titleNb, en: titleEn },
-        description: { nb: descNb, en: descEn },
+        slug,
+        title: { nb: titleNb.trim(), en: titleEn.trim() },
+        description: { nb: descNb.trim(), en: descEn.trim() },
         published: false,
         scope,
         organization_id: organizationId,
@@ -66,7 +115,11 @@ export function NewCourseForm() {
 
       const { data, error } = await supabase.from("learning_courses").insert(row).select("id").single();
       if (error) {
-        setErr(error.message);
+        if (error.message.includes("scope") && error.message.includes("schema cache")) {
+          setErr(t("errorSchemaCache"));
+        } else {
+          setErr(error.message);
+        }
         setLoading(false);
         return;
       }
@@ -87,21 +140,14 @@ export function NewCourseForm() {
         onSubmit={submit}
         className="max-w-lg space-y-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-card)]"
       >
-        <div>
-          <label className="mb-1 block text-sm font-medium">{t("fieldSlug")}</label>
-          <input
-            required
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2 text-sm"
-          />
-        </div>
+        <p className="text-sm text-[var(--color-text-muted)]">{t("slugAutoHint")}</p>
         <div>
           <label className="mb-1 block text-sm font-medium">{t("fieldTitleNb")}</label>
           <input
             value={titleNb}
             onChange={(e) => setTitleNb(e.target.value)}
             className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2 text-sm"
+            placeholder={t("titleNbPlaceholder")}
           />
         </div>
         <div>
@@ -110,8 +156,10 @@ export function NewCourseForm() {
             value={titleEn}
             onChange={(e) => setTitleEn(e.target.value)}
             className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2 text-sm"
+            placeholder={t("titleEnPlaceholder")}
           />
         </div>
+        <p className="text-xs text-[var(--color-text-muted)]">{t("titleEitherLocale")}</p>
         <div>
           <label className="mb-1 block text-sm font-medium">{t("fieldDescNb")}</label>
           <textarea

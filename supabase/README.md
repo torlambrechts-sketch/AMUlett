@@ -13,3 +13,5 @@ The **anon key cannot run migrations**; only the dashboard SQL editor or a role 
 Never commit service role keys or database passwords. Rotate keys if they are exposed.
 
 **Platform admins (LMS):** after `20250326220000_learning_lms.sql`, insert rows into `public.platform_admins (user_id)` using the Supabase SQL editor (as a privileged role) so those users can create **system_default** courses visible to every organization.
+
+If PostgREST returns **schema cache** errors for new columns, confirm the migration ran successfully; the API usually picks up DDL within about a minute. Re-run a trivial `notify pgrst, 'reload schema';` only if your project documents it (most projects auto-reload).

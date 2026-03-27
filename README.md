@@ -26,6 +26,8 @@ SQL migrations live in `supabase/migrations`. Apply them in the Supabase SQL edi
 
 **LMS system courses:** migration `20250326220000_learning_lms.sql` adds `learning_courses.scope` (`system_default` vs `organization`) and `platform_admins`. Insert your user id into `platform_admins` (as postgres) to author default courses for all organizations.
 
+If the app reports **Could not find the 'scope' column** (or similar schema cache errors), the migration has not been applied to that Supabase project yet—run `supabase/migrations/20250326220000_learning_lms.sql` (or the full `ALL_MIGRATIONS.sql` on a new project). Course **slugs** are generated in the app from the title; users do not enter them.
+
 They define:
 
 - Organizations, invitations, JSON-localized roles and capabilities, and row level security
