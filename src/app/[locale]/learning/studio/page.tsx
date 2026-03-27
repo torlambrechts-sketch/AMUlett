@@ -49,6 +49,18 @@ export default async function LearningStudioPage() {
     systemCourses = (data ?? []) as LearningCourseRow[];
   }
 
+  /** Published catalog courses: visible to authors for export (platform admins use the list above). */
+  let systemPublishedForAuthors: LearningCourseRow[] = [];
+  if (access.canAuthorOrg && !access.isPlatformAdmin) {
+    const { data } = await supabase
+      .from("learning_courses")
+      .select("id, organization_id, slug, title, description, published, scope, created_at")
+      .eq("scope", "system_default")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+    systemPublishedForAuthors = (data ?? []) as LearningCourseRow[];
+  }
+
   return (
     <AppShell title={t("studioTitle")}>
       <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("studioIntro")}</p>
@@ -83,6 +95,28 @@ export default async function LearningStudioPage() {
               ))}
             </ul>
           )}
+        </section>
+      ) : null}
+
+      {access.canAuthorOrg && !access.isPlatformAdmin && systemPublishedForAuthors.length > 0 ? (
+        <section className="mb-10">
+          <h2 className="mb-2 text-base font-semibold text-[var(--color-text)]">{t("studioDefaultCatalogForExport")}</h2>
+          <p className="mb-3 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("studioDefaultCatalogForExportIntro")}</p>
+          <ul className="space-y-2">
+            {systemPublishedForAuthors.map((c) => (
+              <StudioCourseListItem
+                key={c.id}
+                course={c}
+                locale={locale}
+                badge={t("badgeDefault")}
+                badgeClassName="text-[var(--color-primary)]"
+                publishedLabel={t("published")}
+                draftLabel={t("draft")}
+                editLabel={t("openToExport")}
+                t={t}
+              />
+            ))}
+          </ul>
         </section>
       ) : null}
 

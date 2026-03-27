@@ -18,7 +18,16 @@ type CourseMeta = {
   description: Record<string, string>;
 };
 
-export function CourseEditor({ course, initialModules }: { course: CourseMeta; initialModules: LearningModuleRow[] }) {
+export function CourseEditor({
+  course,
+  initialModules,
+  readOnly = false,
+}: {
+  course: CourseMeta;
+  initialModules: LearningModuleRow[];
+  /** Published system_default course: export and preview only (org authors). */
+  readOnly?: boolean;
+}) {
   const t = useTranslations("lms");
   const router = useRouter();
   const [modules, setModules] = useState<LearningModuleRow[]>(initialModules);
@@ -178,26 +187,45 @@ export function CourseEditor({ course, initialModules }: { course: CourseMeta; i
         </Link>
       </div>
 
+      {readOnly ? (
+        <p className="rounded-[var(--radius-md)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
+          {t("readOnlySystemCourse")}
+        </p>
+      ) : null}
+
       <div className="flex flex-wrap items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
         <span className="text-sm text-[var(--color-text)]">
           {published ? t("published") : t("draft")}
         </span>
-        <button
-          type="button"
-          disabled={saving}
-          onClick={() => saveMeta(!published)}
-          className="rounded-[var(--radius-md)] bg-[var(--color-primary)] px-3 py-1.5 text-sm font-semibold text-[var(--color-primary-fg)] disabled:opacity-50"
-        >
-          {published ? t("unpublish") : t("publish")}
-        </button>
-        <button
-          type="button"
-          disabled={saving}
-          onClick={() => refresh()}
-          className="text-sm text-[var(--color-primary)] hover:underline"
-        >
-          {t("refresh")}
-        </button>
+        {!readOnly ? (
+          <>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => saveMeta(!published)}
+              className="rounded-[var(--radius-md)] bg-[var(--color-primary)] px-3 py-1.5 text-sm font-semibold text-[var(--color-primary-fg)] disabled:opacity-50"
+            >
+              {published ? t("unpublish") : t("publish")}
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => refresh()}
+              className="text-sm text-[var(--color-primary)] hover:underline"
+            >
+              {t("refresh")}
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => refresh()}
+            className="text-sm text-[var(--color-primary)] hover:underline"
+          >
+            {t("refresh")}
+          </button>
+        )}
       </div>
 
       {msg ? <p className="text-sm text-[var(--color-text-secondary)]">{msg}</p> : null}
@@ -207,36 +235,41 @@ export function CourseEditor({ course, initialModules }: { course: CourseMeta; i
         <textarea
           value={jsonText}
           onChange={(e) => setJsonText(e.target.value)}
+          readOnly={readOnly}
           rows={6}
-          className="mb-2 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2 font-mono text-xs"
+          className="mb-2 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2 font-mono text-xs read-only:bg-[var(--color-surface-elevated)]"
           placeholder={t("jsonPlaceholder")}
         />
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={doExport} className="rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1.5 text-sm">
             {t("exportJson")}
           </button>
-          <button type="button" onClick={doImport} disabled={saving} className="rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1.5 text-sm disabled:opacity-50">
-            {t("importJson")}
-          </button>
+          {!readOnly ? (
+            <button type="button" onClick={doImport} disabled={saving} className="rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1.5 text-sm disabled:opacity-50">
+              {t("importJson")}
+            </button>
+          ) : null}
         </div>
       </section>
 
-      <section>
-        <h3 className="mb-3 text-sm font-semibold">{t("addSection")}</h3>
-        <div className="flex flex-wrap gap-2">
-          {LEARNING_BLOCK_TYPES.map((type) => (
-            <button
-              key={type}
-              type="button"
-              disabled={saving}
-              onClick={() => addBlock(type)}
-              className="rounded-[var(--radius-md)] border border-[var(--color-border)] px-2 py-1 text-xs capitalize disabled:opacity-50"
-            >
-              {type.replace(/_/g, " ")}
-            </button>
-          ))}
-        </div>
-      </section>
+      {!readOnly ? (
+        <section>
+          <h3 className="mb-3 text-sm font-semibold">{t("addSection")}</h3>
+          <div className="flex flex-wrap gap-2">
+            {LEARNING_BLOCK_TYPES.map((type) => (
+              <button
+                key={type}
+                type="button"
+                disabled={saving}
+                onClick={() => addBlock(type)}
+                className="rounded-[var(--radius-md)] border border-[var(--color-border)] px-2 py-1 text-xs capitalize disabled:opacity-50"
+              >
+                {type.replace(/_/g, " ")}
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <div className="space-y-6">
         {modules.map((mod, idx) => (
@@ -245,20 +278,23 @@ export function CourseEditor({ course, initialModules }: { course: CourseMeta; i
               <span className="text-sm font-medium capitalize text-[var(--color-text)]">
                 {mod.module_type.replace(/_/g, " ")} · #{idx + 1}
               </span>
-              <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => moveBlock(mod.id, -1)} className="text-xs text-[var(--color-primary)]">
-                  ↑
-                </button>
-                <button type="button" onClick={() => moveBlock(mod.id, 1)} className="text-xs text-[var(--color-primary)]">
-                  ↓
-                </button>
-                <button type="button" onClick={() => removeBlock(mod.id)} className="text-xs text-red-600">
-                  {t("remove")}
-                </button>
-              </div>
+              {!readOnly ? (
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={() => moveBlock(mod.id, -1)} className="text-xs text-[var(--color-primary)]">
+                    ↑
+                  </button>
+                  <button type="button" onClick={() => moveBlock(mod.id, 1)} className="text-xs text-[var(--color-primary)]">
+                    ↓
+                  </button>
+                  <button type="button" onClick={() => removeBlock(mod.id)} className="text-xs text-red-600">
+                    {t("remove")}
+                  </button>
+                </div>
+              ) : null}
             </div>
             <JsonContentEditor
               key={mod.id}
+              readOnly={readOnly}
               content={mod.content}
               onChange={(c) => updateLocalContent(mod.id, c)}
               onSave={(c) => persistContent(mod.id, c)}
@@ -278,10 +314,12 @@ function JsonContentEditor({
   content,
   onChange,
   onSave,
+  readOnly = false,
 }: {
   content: Record<string, unknown>;
   onChange: (c: Record<string, unknown>) => void;
   onSave: (c: Record<string, unknown>) => void;
+  readOnly?: boolean;
 }) {
   const t = useTranslations("lms");
   const [text, setText] = useState(() => JSON.stringify(content, null, 2));
@@ -292,7 +330,9 @@ function JsonContentEditor({
       <label className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">{t("contentJson")}</label>
       <textarea
         value={text}
+        readOnly={readOnly}
         onChange={(e) => {
+          if (readOnly) return;
           setText(e.target.value);
           setErr(null);
           try {
@@ -302,25 +342,27 @@ function JsonContentEditor({
           }
         }}
         rows={8}
-        className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2 font-mono text-xs"
+        className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-2 font-mono text-xs read-only:opacity-90"
       />
       {err ? <p className="text-xs text-red-600">{err}</p> : null}
-      <button
-        type="button"
-        className="mt-2 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1 text-xs"
-        onClick={() => {
-          try {
-            const c = JSON.parse(text) as Record<string, unknown>;
-            onChange(c);
-            void onSave(c);
-            setErr(null);
-          } catch {
-            setErr("Invalid JSON");
-          }
-        }}
-      >
-        {t("saveContent")}
-      </button>
+      {!readOnly ? (
+        <button
+          type="button"
+          className="mt-2 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1 text-xs"
+          onClick={() => {
+            try {
+              const c = JSON.parse(text) as Record<string, unknown>;
+              onChange(c);
+              void onSave(c);
+              setErr(null);
+            } catch {
+              setErr("Invalid JSON");
+            }
+          }}
+        >
+          {t("saveContent")}
+        </button>
+      ) : null}
     </div>
   );
 }

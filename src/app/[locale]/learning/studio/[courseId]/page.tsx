@@ -37,9 +37,17 @@ export default async function StudioCoursePage({ params }: Props) {
 
   const canEditSystem = course.scope === "system_default" && access.isPlatformAdmin;
 
-  if (!canEditOrg && !canEditSystem) {
+  const canViewSystemForExport =
+    course.scope === "system_default" &&
+    course.published &&
+    access.canAuthorOrg &&
+    !access.isPlatformAdmin;
+
+  if (!canEditOrg && !canEditSystem && !canViewSystemForExport) {
     redirect(`/${locale}/learning`);
   }
+
+  const readOnly = canViewSystemForExport;
 
   const { data: modRows } = await supabase
     .from("learning_modules")
@@ -56,6 +64,7 @@ export default async function StudioCoursePage({ params }: Props) {
   return (
     <AppShell title={`${t("studioTitle")}: ${shell.title}`} titleLocaleNote={shell.titleLocaleNote}>
       <CourseEditor
+        readOnly={readOnly}
         course={{
           id: course.id,
           slug: course.slug,
