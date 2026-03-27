@@ -24,6 +24,31 @@ Apply the SQL migration `20250326210000_invitation_rpcs.sql` so `get_invitation_
 
 SQL migrations live in `supabase/migrations`. Apply them in the Supabase SQL editor or via the Supabase CLI. To run everything in one go, paste **`supabase/ALL_MIGRATIONS.sql`** into **SQL → New query** (anon keys cannot execute DDL).
 
+### Automate migrations (no SQL Editor each time)
+
+Anything that can open **Postgres as the `postgres` user** can run your migration files. Vercel does **not** do this by default (your app uses the anon/service keys, not DDL).
+
+**Option A — GitHub Actions (recommended)**  
+Workflow: `.github/workflows/supabase-migrations.yml`. It runs `scripts/apply-migrations.sh` when you push changes under `supabase/migrations/` to `main` (or run the workflow manually).
+
+1. In the GitHub repo: **Settings → Secrets and variables → Actions → New repository secret**  
+   Name: `POSTGRES_URL_NON_POOLING`  
+   Value: Supabase **Project Settings → Database → Connection string → URI** (direct connection, port **5432**, user `postgres`, include password).  
+2. Merge migration files to `main` (or trigger **Actions → Apply Supabase migrations → Run workflow**).
+
+**Option B — Your machine or CI**  
+With `postgresql-client` installed:
+
+```bash
+export POSTGRES_URL_NON_POOLING="postgres://postgres.[ref]:YOUR_PASSWORD@db.[ref].supabase.co:5432/postgres?sslmode=require"
+./scripts/apply-migrations.sh
+```
+
+**Option C — Supabase CLI**  
+`supabase link` then `supabase db push` (keeps migration history in Supabase; good for teams already on the CLI).
+
+Never commit the database password or service role key; keep them only in GitHub Actions secrets or Vercel **server** env vars.
+
 **LMS system courses:** migration `20250326220000_learning_lms.sql` adds `learning_courses.scope` (`system_default` vs `organization`) and `platform_admins`. Insert your user id into `platform_admins` (as postgres) to author default courses for all organizations.
 
 If the app reports **Could not find the 'scope' column** (or similar schema cache errors), the migration has not been applied to that Supabase project yet—run `supabase/migrations/20250326220000_learning_lms.sql` (or the full `ALL_MIGRATIONS.sql` on a new project). Course **slugs** are generated in the app from the title; users do not enter them.
