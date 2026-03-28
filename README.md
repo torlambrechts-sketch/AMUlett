@@ -24,6 +24,26 @@ Apply the SQL migration `20250326210000_invitation_rpcs.sql` so `get_invitation_
 
 SQL migrations live in `supabase/migrations`. Apply them in the Supabase SQL editor or via the Supabase CLI. To run everything in one go, paste **`supabase/ALL_MIGRATIONS.sql`** into **SQL → New query** (anon keys cannot execute DDL).
 
+### “Relation already exists” on an existing project
+
+`ALL_MIGRATIONS.sql` is **not** idempotent: it assumes an empty `public` schema. If the database already has tables from a previous partial run, you get errors like `relation "organizations" already exists`.
+
+**Option A — wipe app schema and re-apply (destructive)**  
+This removes **all data** in `public` (organizations, wiki, tasks, etc.). Auth users in `auth.users` are **not** deleted; storage **files** may remain as orphans until you clean the bucket.
+
+1. From the repo, with `POSTGRES_URL_NON_POOLING` set:
+
+   ```bash
+   ./scripts/reset-and-apply-migrations.sh
+   ```
+
+2. Or run **`supabase/reset_public_schema.sql`** once in the SQL editor, then run **`ALL_MIGRATIONS.sql`** (or `./scripts/apply-migrations.sh`).
+
+**Option B — keep data**  
+Apply only migration files you have **not** run yet, in filename order (do **not** paste the full `ALL_MIGRATIONS.sql`).
+
+We do **not** add `DROP TABLE` to each numbered migration file: that would destroy production data on every CI run.
+
 ### Automate migrations (no SQL Editor each time)
 
 Anything that can open **Postgres as the `postgres` user** can run your migration files. Vercel does **not** do this by default (your app uses the anon/service keys, not DDL).
