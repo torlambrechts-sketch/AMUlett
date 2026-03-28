@@ -36,7 +36,7 @@ export default async function WikiPageEdit({ params }: Props) {
   const { data: page } = await supabase
     .from("wiki_pages")
     .select(
-      "id, slug, title, publish_status, requires_approval, review_reminder_months, next_review_at, current_revision_id"
+      "id, slug, title, publish_status, requires_approval, review_reminder_months, next_review_at, current_revision_id, library_category"
     )
     .eq("space_id", space.id)
     .eq("slug", pageSlug)
@@ -77,6 +77,7 @@ export default async function WikiPageEdit({ params }: Props) {
         pageSlug={page.slug}
         organizationId={org.organizationId}
         initialTitle={page.title as Record<string, string>}
+        initialLibraryCategory={(page.library_category as string) ?? "general"}
         initialPublishStatus={page.publish_status as string}
         requiresApproval={page.requires_approval as boolean}
         reviewMonths={page.review_reminder_months as number | null}

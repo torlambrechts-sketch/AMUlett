@@ -12,6 +12,7 @@ import { parseWikiDocument } from "@/lib/wiki/types";
 import { userCanWikiWrite, userIsOrgAdmin } from "@/lib/wiki/server-access";
 import { WikiFavoriteButton } from "@/components/wiki/wiki-favorite-button";
 import { WikiPresenceBar } from "@/components/wiki/wiki-presence";
+import { WikiDeleteButton } from "@/components/documents/wiki-delete-button";
 
 type Props = { params: Promise<{ spaceSlug: string; pageSlug: string }> };
 
@@ -111,6 +112,7 @@ export default async function WikiPageView({ params }: Props) {
             <Link href={`/documents/s/${spaceSlug}/p/${pageSlug}/edit`} className="text-[var(--color-primary)] hover:underline">
               {t("edit")}
             </Link>
+            <WikiDeleteButton pageId={page.id} spaceSlug={spaceSlug} />
             <Link href={`/documents/s/${spaceSlug}/p/${pageSlug}/history`} className="text-[var(--color-text-muted)] hover:underline">
               {t("history")}
             </Link>

@@ -8,6 +8,7 @@ import { resolveLocalized } from "@/lib/learning/localize";
 import { emptyWikiDocument, type WikiEditorDocument } from "@/lib/wiki/types";
 import { wikiDocumentToPlainText } from "@/lib/wiki/plain-text";
 import type { WikiTemplateMeta } from "@/lib/wiki/templates";
+import { LIBRARY_CATEGORIES, type LibraryCategory } from "@/lib/documents/library-categories";
 
 export function WikiNewPageForm({
   spaceId,
@@ -28,6 +29,7 @@ export function WikiNewPageForm({
   const [title, setTitle] = useState("");
   const [parentId, setParentId] = useState("");
   const [templateKey, setTemplateKey] = useState("");
+  const [libraryCategory, setLibraryCategory] = useState<LibraryCategory>("general");
   const [requiresApproval, setRequiresApproval] = useState(false);
   const [reviewMonths, setReviewMonths] = useState("");
   const [busy, setBusy] = useState(false);
@@ -76,6 +78,7 @@ export function WikiNewPageForm({
         slug: s,
         title: titleJson,
         publish_status: "draft",
+        library_category: libraryCategory,
         requires_approval: requiresApproval,
         review_reminder_months: reviewMonths ? parseInt(reviewMonths, 10) : null,
         next_review_at: reviewMonths ? monthsFromNow(parseInt(reviewMonths, 10)) : null,
@@ -134,6 +137,20 @@ export function WikiNewPageForm({
           {parentOptions.map((p) => (
             <option key={p.id} value={p.id}>
               {resolveLocalized(p.title ?? {}, locale).text || p.slug}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium">{t("libraryCategory")}</label>
+        <select
+          value={libraryCategory}
+          onChange={(e) => setLibraryCategory(e.target.value as LibraryCategory)}
+          className="w-full rounded border px-3 py-2 text-sm"
+        >
+          {LIBRARY_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {t(`category.${c}`)}
             </option>
           ))}
         </select>

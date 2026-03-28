@@ -10,6 +10,7 @@ import { WikiDocView } from "@/components/wiki/wiki-doc-view";
 import { WikiPresenceBar } from "@/components/wiki/wiki-presence";
 import { WikiBlocksEditor } from "@modules/editor";
 import { resolveLocalized } from "@/lib/learning/localize";
+import { LIBRARY_CATEGORIES, type LibraryCategory, isLibraryCategory } from "@/lib/documents/library-categories";
 
 export function WikiPageEditor({
   spaceSlug,
@@ -17,6 +18,7 @@ export function WikiPageEditor({
   pageSlug,
   organizationId,
   initialTitle,
+  initialLibraryCategory,
   initialPublishStatus,
   requiresApproval,
   reviewMonths: initialReviewMonths,
@@ -33,6 +35,7 @@ export function WikiPageEditor({
   organizationId: string;
   pageSlug: string;
   initialTitle: Record<string, string>;
+  initialLibraryCategory: string;
   initialPublishStatus: string;
   requiresApproval: boolean;
   reviewMonths: number | null;
@@ -57,6 +60,9 @@ export function WikiPageEditor({
 
   const [title, setTitle] = useState(
     () => initialTitle[locale] ?? Object.values(initialTitle).find(Boolean) ?? ""
+  );
+  const [libraryCategory, setLibraryCategory] = useState<LibraryCategory>(() =>
+    isLibraryCategory(initialLibraryCategory) ? initialLibraryCategory : "general",
   );
   const [publishStatus, setPublishStatus] = useState(initialPublishStatus);
   const [reqAppr, setReqAppr] = useState(requiresApproval);
@@ -206,6 +212,7 @@ export function WikiPageEditor({
         requires_approval: reqAppr,
         review_reminder_months: monthsVal && monthsVal > 0 ? monthsVal : null,
         next_review_at: nextReview,
+        library_category: libraryCategory,
       })
       .eq("id", pageId);
 
@@ -233,6 +240,7 @@ export function WikiPageEditor({
       .update({
         publish_status: "published",
         next_review_at: nextReview,
+        library_category: libraryCategory,
       })
       .eq("id", pageId);
     setPublishStatus("published");
@@ -248,6 +256,20 @@ export function WikiPageEditor({
       <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
         <label className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">{t("fieldTitle")}</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full rounded border px-3 py-2 text-sm" />
+        <div className="mt-4">
+          <label className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">{t("libraryCategory")}</label>
+          <select
+            value={libraryCategory}
+            onChange={(e) => setLibraryCategory(e.target.value as LibraryCategory)}
+            className="w-full max-w-md rounded border px-3 py-2 text-sm sm:w-auto"
+          >
+            {LIBRARY_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {t(`category.${c}`)}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
