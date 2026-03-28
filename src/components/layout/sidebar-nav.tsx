@@ -49,7 +49,7 @@ export function SidebarNav({
                   ? "h-11 w-11 shrink-0 justify-center p-0"
                   : "gap-3 py-2.5 pl-3 pr-2",
                 active
-                  ? "bg-[var(--sidebar-active-bg)] text-[var(--color-primary)] shadow-sm"
+                  ? "bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] shadow-sm"
                   : "text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]",
               ].join(" ")}
             >

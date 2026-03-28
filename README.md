@@ -87,7 +87,7 @@ Design tokens are CSS variables in `src/app/globals.css`: semantic colors, radii
 
 **Feature modules:** Shared product logic that spans LMS and documents lives under `src/modules/` (e.g. `@modules/editor` for TipTap, LMS visual content forms, and wiki block editing). Import only from each module’s `index.ts` so features stay decoupled from internal file layout.
 
-The shell uses a **dark navy sidebar**, **blue primary actions**, **white top bar** with a generic **AMUlett** logo mark, and a **card-based dashboard** layout inspired by common document/HR dashboards. Design tokens live in `src/app/globals.css`.
+The shell uses a **deep navy sidebar** (`#001a3d`) with **white** navigation text, a **light grey** main canvas, **white** content cards, and **blue** primary actions. The top bar is white on the grey workspace. Design tokens live in `src/app/globals.css`.
 
 ## Deploy
 

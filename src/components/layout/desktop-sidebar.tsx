@@ -62,11 +62,11 @@ export function DesktopSidebar({ userEmail }: { userEmail: string | null }) {
         {collapsed ? (
           <Link
             href="/"
-            className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-primary)] transition hover:bg-[var(--sidebar-hover)]"
+            className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] text-[var(--sidebar-text)] transition hover:bg-[var(--sidebar-hover)]"
             aria-label={t("home")}
             title={t("appName")}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--color-primary-muted)]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-white/15 text-[var(--sidebar-text)]">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path
                   d="M12 3L4 9v12h16V9l-8-6z"

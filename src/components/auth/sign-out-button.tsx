@@ -29,7 +29,7 @@ export function SignOutButton({
         onClick={signOut}
         title={signOutLabel}
         aria-label={signOutLabel}
-        className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--sidebar-border)] text-[var(--sidebar-text-muted)] transition hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
+        className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] border border-white/20 text-[var(--sidebar-text-muted)] transition hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
       >
         <IconSignOut className="h-4 w-4" />
       </button>
@@ -38,7 +38,7 @@ export function SignOutButton({
 
   const cls =
     variant === "sidebar" || variant === "sidebarLight"
-      ? "w-full rounded-[var(--radius-md)] border border-[var(--sidebar-border)] px-3 py-2 text-xs font-medium text-[var(--sidebar-text-secondary)] hover:bg-[var(--sidebar-hover)]"
+      ? "w-full rounded-[var(--radius-md)] border border-white/20 px-3 py-2 text-xs font-medium text-[var(--sidebar-text-secondary)] hover:bg-[var(--sidebar-hover)]"
       : "rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)]";
 
   return (
