@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
+import { userIsSafetyRep } from "@/lib/amu/server-access";
 import { HseNewRecordForm } from "@/components/hse/hse-new-record-form";
 
 export default async function HseHaltPage() {
@@ -15,10 +16,12 @@ export default async function HseHaltPage() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) redirect(`/${locale}/login`);
 
+  const isVo = await userIsSafetyRep(org.organizationId);
+
   return (
     <AppShell title={`${t("hse")} — ${th("haltTitle")}`}>
       <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{th("haltIntro")}</p>
-      <HseNewRecordForm organizationId={org.organizationId} kind="halted_work" />
+      <HseNewRecordForm organizationId={org.organizationId} kind="halted_work" allowHaltWork={isVo} />
     </AppShell>
   );
 }

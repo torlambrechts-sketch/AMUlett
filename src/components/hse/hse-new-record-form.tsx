@@ -10,9 +10,12 @@ type RecordKind = "deviation" | "risk_assessment" | "halted_work";
 export function HseNewRecordForm({
   organizationId,
   kind,
+  allowHaltWork = true,
 }: {
   organizationId: string;
   kind: RecordKind;
+  /** Only VO may register halted work (§ 6-3). */
+  allowHaltWork?: boolean;
 }) {
   const t = useTranslations("hse");
   const locale = useLocale();
@@ -32,6 +35,10 @@ export function HseNewRecordForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
+    if (kind === "halted_work" && !allowHaltWork) {
+      window.alert(t("haltVoOnlyCreate"));
+      return;
+    }
     setBusy(true);
     const supabase = createSupabaseBrowserClient();
     const {
@@ -77,7 +84,6 @@ export function HseNewRecordForm({
         areaLabel: areaLabel.trim() || undefined,
         equipmentLabel: equipmentLabel.trim() || undefined,
       };
-      row.halt_alert_sent_at = new Date().toISOString();
     }
 
     const { data, error } = await supabase.from("hse_records").insert(row).select("id").single();
@@ -85,6 +91,10 @@ export function HseNewRecordForm({
     if (error) {
       window.alert(error.message);
       return;
+    }
+    if (kind === "halted_work" && data?.id) {
+      const { error: notifyErr } = await supabase.rpc("notify_hse_halt_work_submitted", { p_hse_record_id: data.id });
+      if (notifyErr) window.alert(notifyErr.message);
     }
     if (data?.id) router.push(`/hse/record/${data.id}`);
     else router.refresh();
@@ -199,7 +209,11 @@ export function HseNewRecordForm({
         </>
       ) : null}
 
-      {kind === "halted_work" ? (
+      {kind === "halted_work" && !allowHaltWork ? (
+        <p className="text-sm text-amber-800 dark:text-amber-200">{t("haltVoOnlyCreate")}</p>
+      ) : null}
+
+      {kind === "halted_work" && allowHaltWork ? (
         <>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">{t("fieldDescription")}</label>
@@ -232,7 +246,7 @@ export function HseNewRecordForm({
 
       <button
         type="submit"
-        disabled={busy}
+        disabled={busy || (kind === "halted_work" && !allowHaltWork)}
         className="rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
       >
         {busy ? "…" : t("submitRecord")}

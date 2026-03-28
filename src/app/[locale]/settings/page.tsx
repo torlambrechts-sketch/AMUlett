@@ -4,6 +4,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { InvitesSection } from "@/components/settings/invites-section";
+import { HseHaltSettings } from "@/components/settings/hse-halt-settings";
 import { normalizeInvitationRole } from "@/lib/org/invitation-role";
 
 function pickLocalized(
@@ -58,6 +59,14 @@ export default async function SettingsPage() {
 
   const { data: roles } = await supabase.from("roles").select("id, code, label").order("code");
 
+  const { data: hseOrg } = await supabase
+    .from("hse_org_settings")
+    .select("halt_alert_emails")
+    .eq("organization_id", org.organizationId)
+    .maybeSingle();
+
+  const haltEmails = (hseOrg?.halt_alert_emails as string[] | null) ?? [];
+
   const { data: pending } = await supabase
     .from("organization_invitations")
     .select("id, email, expires_at, roles ( code, label )")
@@ -103,6 +112,12 @@ export default async function SettingsPage() {
           </div>
         </dl>
       </section>
+
+      {isOrgAdmin ? (
+        <section className="mb-10 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-card)]">
+          <HseHaltSettings organizationId={org.organizationId} initialEmails={haltEmails} />
+        </section>
+      ) : null}
 
       {isOrgAdmin ? (
         <InvitesSection

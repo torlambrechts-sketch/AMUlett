@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { userIsSafetyRep } from "@/lib/amu/server-access";
 import { userCanWriteHse } from "@/lib/hse/server-access";
+import { getOrganizationMembersWithRoles } from "@/lib/amu/org-members";
 import { HseRecordDetailClient, type HseRecordDetail } from "@/components/hse/hse-record-detail-client";
 import Link from "next/link";
 
@@ -35,6 +36,7 @@ export default async function HseRecordPage({ params }: { params: Promise<Params
   const isVo = await userIsSafetyRep(org.organizationId);
   const canWriteHse = await userCanWriteHse(org.organizationId);
   const showActionPlan = canWriteHse || isVo;
+  const actionPlanMembers = showActionPlan ? await getOrganizationMembersWithRoles(org.organizationId) : [];
 
   const record: HseRecordDetail = {
     id: row.id,
@@ -59,7 +61,8 @@ export default async function HseRecordPage({ params }: { params: Promise<Params
     created_by: row.created_by,
   };
 
-  const canEscalate = isVo && record.record_type === "deviation";
+  const canEscalateToAmu = isVo && record.record_type === "deviation";
+  const canReleaseHalt = isVo && record.record_type === "halted_work";
 
   return (
     <AppShell title={`${t("hse")} — ${th("recordDetail")}`}>
@@ -70,8 +73,10 @@ export default async function HseRecordPage({ params }: { params: Promise<Params
       <HseRecordDetailClient
         record={record}
         locale={locale}
-        canEscalate={canEscalate}
+        canEscalateToAmu={canEscalateToAmu}
+        canReleaseHalt={canReleaseHalt}
         showActionPlanButton={showActionPlan}
+        actionPlanMembers={actionPlanMembers}
       />
 
     </AppShell>

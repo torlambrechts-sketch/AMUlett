@@ -5,7 +5,8 @@ import { useRouter } from "@/i18n/navigation";
 import { useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { HseEscalateButton } from "@/components/amu/hse-escalate-button";
-import { HseCreateActionPlanButton } from "@/components/hse/hse-create-action-plan-button";
+import { HseActionPlanForm } from "@/components/hse/hse-action-plan-form";
+import type { OrgMemberOption } from "@/lib/amu/org-members";
 import { riskBandBadgeClass, type RiskBand } from "@/lib/hse/risk";
 
 const ALLOWED_EXT = new Set(["png", "jpg", "jpeg", "gif", "webp", "pdf"]);
@@ -36,11 +37,20 @@ export type HseRecordDetail = {
 type Props = {
   record: HseRecordDetail;
   locale: string;
-  canEscalate: boolean;
+  canEscalateToAmu: boolean;
+  canReleaseHalt: boolean;
   showActionPlanButton: boolean;
+  actionPlanMembers: OrgMemberOption[];
 };
 
-export function HseRecordDetailClient({ record: initial, locale, canEscalate, showActionPlanButton }: Props) {
+export function HseRecordDetailClient({
+  record: initial,
+  locale,
+  canEscalateToAmu,
+  canReleaseHalt,
+  showActionPlanButton,
+  actionPlanMembers,
+}: Props) {
   const t = useTranslations("hse");
   const uiLocale = useLocale();
   const router = useRouter();
@@ -64,7 +74,10 @@ export function HseRecordDetailClient({ record: initial, locale, canEscalate, sh
     const supabase = createSupabaseBrowserClient();
     const { error } = await supabase.from("hse_records").update({ status: next }).eq("id", record.id);
     setBusy(false);
-    if (error) window.alert(error.message);
+    if (error) {
+      if (error.message.includes("ACTION_PLAN_REQUIRED")) window.alert(t("closeBlockedActionPlan"));
+      else window.alert(error.message);
+    }
     else {
       setStatus(next);
       setRecord((r) => ({ ...r, status: next }));
@@ -140,7 +153,12 @@ export function HseRecordDetailClient({ record: initial, locale, canEscalate, sh
             {record.risk_score != null ? ` (${record.risk_score})` : ""}
           </span>
           {record.action_plan_required && !record.action_plan_task_id && showActionPlanButton ? (
-            <HseCreateActionPlanButton organizationId={record.organization_id} hseRecordId={record.id} disabled={busy} />
+            <HseActionPlanForm
+              organizationId={record.organization_id}
+              hseRecordId={record.id}
+              members={actionPlanMembers}
+              disabled={busy}
+            />
           ) : null}
           {record.action_plan_task_id ? (
             <span className="text-sm text-[var(--color-text-muted)]">
@@ -183,7 +201,7 @@ export function HseRecordDetailClient({ record: initial, locale, canEscalate, sh
           ) : null}
           {record.halt_released_at ? (
             <p className="mt-2 text-xs">{t("haltReleasedAt", { date: new Date(record.halt_released_at).toLocaleString(locale) })}</p>
-          ) : canEscalate ? (
+          ) : canReleaseHalt ? (
             <button
               type="button"
               disabled={busy}
@@ -231,10 +249,11 @@ export function HseRecordDetailClient({ record: initial, locale, canEscalate, sh
           >
             <option value="open">open</option>
             <option value="in_progress">in_progress</option>
+            {record.record_type === "deviation" ? <option value="escalated_to_amu">escalated_to_amu</option> : null}
             <option value="closed">closed</option>
           </select>
         </label>
-        {canEscalate && record.record_type === "deviation" ? (
+        {canEscalateToAmu && record.record_type === "deviation" ? (
           <HseEscalateButton recordId={record.id} alreadyEscalated={record.escalated_to_amu} />
         ) : null}
       </div>
