@@ -185,6 +185,54 @@
     "haltReleaseVoOnly": "Only the safety representative (VO) can release a halt.",
     "newHaltWork": "Register halt work"
   },
+  "survey": {
+    "type": {
+      "pulse": "Pulse survey",
+      "culture": "Full culture survey"
+    },
+    "dashboard": {
+      "nps": "Employee Net Promoter Score (eNPS)",
+      "participation": "Responses (this department)"
+    },
+    "actionPlans": {
+      "new_plan": "Create action plan"
+    },
+    "actionPlanModalIntro": "Create a follow-up task linked to this survey and department.",
+    "actionPlanAssignee": "Assignee",
+    "actionPlanDeadline": "Deadline",
+    "actionPlanPickAssignee": "Select assignee…",
+    "actionPlanAssigneeRequired": "Choose an assignee.",
+    "createTask": "Create task",
+    "cancel": "Cancel",
+    "adminLink": "Survey administration",
+    "adminTitle": "Administration",
+    "adminIntro": "Publish draft surveys or close active ones. Template pulse and culture surveys are created per organization.",
+    "publish": "Publish",
+    "closeSurvey": "Close survey",
+    "takeSurvey": "Take survey",
+    "alreadyResponded": "Submitted",
+    "analytics": "Analytics",
+    "noPublishedSurveys": "No published surveys yet. Ask an administrator to publish a survey.",
+    "backToList": "Back to surveys",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "pickDepartment": "Select your department.",
+    "answerAll": "Please answer every question.",
+    "yourDepartment": "Department (for aggregated reporting)",
+    "noQuestions": "This survey has no questions yet.",
+    "filterDepartment": "Department",
+    "refresh": "Refresh",
+    "anonymityHidden": "Data hidden to protect employee anonymity (minimum {min} responses required; current: {count}).",
+    "psychSafetyRisk": "Psychological safety risk: aggregate score is below the threshold.",
+    "analysisTitle": "Analysis",
+    "actionPlanPrompt": "Low scores — create an action plan",
+    "createActionPlanFor": "Create action plan: {category}",
+    "loadAnalytics": "Loading…",
+    "noTrend": "Historical trend appears when you compare survey rounds over time.",
+    "analyticsIntro": "Aggregated metrics only. Raw responses are not shown to managers.",
+    "noManagedDepartments": "You are not assigned as a department manager. Ask an administrator to grant access."
+  },
   "hseSettings": {
     "haltAlertsTitle": "Halt work alerts",
     "haltAlertsHint": "Comma-separated email addresses notified when the VO registers a halt (§ 6-3). Connect an email/SMS worker to the hse_halt_alert_outbox table for production delivery.",

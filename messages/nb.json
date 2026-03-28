@@ -185,6 +185,54 @@
     "haltReleaseVoOnly": "Kun verneombud (VO) kan oppheve stans.",
     "newHaltWork": "Registrer stans"
   },
+  "survey": {
+    "type": {
+      "pulse": "Pulsundersøkelse",
+      "culture": "Full kulturundersøkelse"
+    },
+    "dashboard": {
+      "nps": "eNPS (Employee Net Promoter Score)",
+      "participation": "Svar (denne avdelingen)"
+    },
+    "actionPlans": {
+      "new_plan": "Opprett tiltaksplan"
+    },
+    "actionPlanModalIntro": "Opprett en oppfølgingsoppgave koblet til denne undersøkelsen og avdelingen.",
+    "actionPlanAssignee": "Ansvarlig",
+    "actionPlanDeadline": "Frist",
+    "actionPlanPickAssignee": "Velg ansvarlig…",
+    "actionPlanAssigneeRequired": "Velg ansvarlig.",
+    "createTask": "Opprett oppgave",
+    "cancel": "Avbryt",
+    "adminLink": "Administrasjon av undersøkelser",
+    "adminTitle": "Administrasjon",
+    "adminIntro": "Publiser utkast eller lukk aktive undersøkelser. Maler for puls og kultur opprettes per organisasjon.",
+    "publish": "Publiser",
+    "closeSurvey": "Lukk undersøkelse",
+    "takeSurvey": "Besvar",
+    "alreadyResponded": "Besvart",
+    "analytics": "Analyse",
+    "noPublishedSurveys": "Ingen publiserte undersøkelser ennå. Be en administrator publisere.",
+    "backToList": "Tilbake til undersøkelser",
+    "back": "Tilbake",
+    "next": "Neste",
+    "submit": "Send inn",
+    "pickDepartment": "Velg avdeling.",
+    "answerAll": "Besvar alle spørsmål.",
+    "yourDepartment": "Avdeling (for aggregert rapportering)",
+    "noQuestions": "Denne undersøkelsen har ingen spørsmål ennå.",
+    "filterDepartment": "Avdeling",
+    "refresh": "Oppdater",
+    "anonymityHidden": "Data skjules for å beskytte anonymitet (minimum {min} svar; nå: {count}).",
+    "psychSafetyRisk": "Risiko for psykologisk trygghet: samlet score er under terskelen.",
+    "analysisTitle": "Analyse",
+    "actionPlanPrompt": "Lave scorer — opprett tiltaksplan",
+    "createActionPlanFor": "Opprett tiltaksplan: {category}",
+    "loadAnalytics": "Laster…",
+    "noTrend": "Historisk trend vises når du sammenligner flere runder over tid.",
+    "analyticsIntro": "Kun aggregerte tall. Råsvar vises ikke for ledere.",
+    "noManagedDepartments": "Du er ikke satt som avdelingsleder. Be administrator om tilgang."
+  },
   "hseSettings": {
     "haltAlertsTitle": "Varsler ved stans",
     "haltAlertsHint": "E-postadresser (kommaseparert) som varsles når VO registrerer stans. Koble en e-post/SMS-worker til tabellen hse_halt_alert_outbox i produksjon.",
