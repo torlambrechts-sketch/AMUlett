@@ -125,7 +125,7 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      <section className="mt-8">
+      <section className="mt-8 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-card)]">
         <h2 className="mb-4 text-base font-semibold text-[var(--color-text)]">
           {locale === "nb" ? "Moduler" : "Modules"}
         </h2>
@@ -156,7 +156,7 @@ function QuickTile({
   cta: string;
 }) {
   return (
-    <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4">
+    <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm">
       <h3 className="text-sm font-semibold text-[var(--color-text)]">{title}</h3>
       <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">{desc}</p>
       <Link href={href} className="mt-3 inline-block text-sm font-medium text-[var(--color-primary)] hover:underline">

@@ -2,7 +2,7 @@
 
 :root {
   /* Main: light grey canvas + white cards (dashboard reference) */
-  --color-bg: #eef1f5;
+  --color-bg: #eef1f5; /* alias; prefer --workspace-bg for main column */
   --color-surface: #ffffff;
   --color-surface-elevated: #f8fafc;
   --color-border: #e2e8f0;
@@ -31,46 +31,21 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
-  --shadow-card: 0 1px 3px rgb(15 23 42 / 0.07), 0 4px 12px rgb(15 23 42 / 0.05);
+  --shadow-card: 0 1px 3px rgb(15 23 42 / 0.08), 0 4px 14px rgb(15 23 42 / 0.06);
+  /* Workspace (main column only): always light grey — do not tie to OS dark mode */
+  --workspace-bg: #eef1f5;
   --sidebar-w: 15.5rem;
   --sidebar-w-collapsed: 4.5rem;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #0f1419;
-    --color-surface: #1a222d;
-    --color-surface-elevated: #232d3b;
-    --color-border: #334155;
-    --color-text: #f1f5f9;
-    --color-text-secondary: #cbd5e1;
-    --color-text-muted: #94a3b8;
-    --color-primary: #3b82f6;
-    --color-primary-hover: #60a5fa;
-    --color-primary-muted: rgba(59, 130, 246, 0.2);
-    --color-primary-fg: #ffffff;
-    --header-logo-bg: #2563eb;
-    --sidebar-bg: #0a1628;
-    --sidebar-border: rgba(255, 255, 255, 0.1);
-    --sidebar-text: #ffffff;
-    --sidebar-text-secondary: rgba(255, 255, 255, 0.88);
-    --sidebar-text-muted: rgba(255, 255, 255, 0.62);
-    --sidebar-hover: rgba(255, 255, 255, 0.08);
-    --sidebar-active-bg: rgba(255, 255, 255, 0.95);
-    --sidebar-active-text: #3b82f6;
-    --sidebar-active-bar: #22c55e;
-    --sidebar-logo-tint: rgba(255, 255, 255, 0.12);
-  }
-}
-
 html {
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-bg);
+  background: var(--workspace-bg);
   color: var(--color-text);
   min-height: 100vh;
 }

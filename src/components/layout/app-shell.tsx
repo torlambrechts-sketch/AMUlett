@@ -50,10 +50,10 @@ export async function AppShell({
   const displayName = displayNameFromEmail(userEmail) || userEmail || "";
 
   return (
-    <div className="flex min-h-screen bg-[var(--color-bg)]">
+    <div className="flex min-h-screen">
       <DesktopSidebar userEmail={userEmail} />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col bg-[var(--workspace-bg)]">
         <header className="sticky top-0 z-40 flex h-[4.25rem] items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 sm:px-5">
           <MobileNav />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3 lg:gap-4">
@@ -106,7 +106,7 @@ export async function AppShell({
           </div>
         </header>
 
-        <main className="flex-1 bg-[var(--color-bg)] px-4 py-5 md:px-6 md:py-6 lg:px-8">{children}</main>
+        <main className="flex-1 bg-[var(--workspace-bg)] px-4 py-5 md:px-6 md:py-6 lg:px-8">{children}</main>
       </div>
     </div>
   );
