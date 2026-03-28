@@ -10,6 +10,7 @@ import { AmuSubnav } from "@/components/amu/amu-subnav";
 
 export default async function WorkCouncilDashboardPage() {
   const t = await getTranslations("amu");
+  const tc = await getTranslations("compliance");
   const locale = await getLocale();
   const org = await getUserOrgContext();
   if (!org) redirect(`/${locale}/onboarding`);
@@ -123,6 +124,12 @@ export default async function WorkCouncilDashboardPage() {
             <span className="text-[var(--color-text-muted)]">{t("quickHseDesc")}</span>
           </li>
         </ul>
+      </div>
+
+      <div className="mt-8 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 text-xs text-[var(--color-text-muted)]">
+        <p className="font-medium text-[var(--color-text)]">{tc("title")}</p>
+        <p className="mt-2">{tc("amu_committee_members")}</p>
+        <p className="mt-2">{tc("amu_sign")}</p>
       </div>
 
       <p className="mt-6 text-xs text-[var(--color-text-muted)]">{t("migrationHint")}</p>

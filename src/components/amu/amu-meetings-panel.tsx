@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { AmuMeetingMinutesEditor } from "@/components/amu/amu-meeting-minutes-editor";
 
 export type MeetingRow = {
   id: string;
@@ -13,15 +14,21 @@ export type MeetingRow = {
   minutes_document: Record<string, unknown> | null;
 };
 
+export type MeetingHseStats = {
+  open: number;
+  incident: number;
+  risk_assessment: number;
+};
+
 export function AmuMeetingsPanel({
   organizationId,
   meetings,
-  hseOpen: hseOpenCount,
+  hseStats,
   canWrite,
 }: {
   organizationId: string;
   meetings: MeetingRow[];
-  hseOpen: number;
+  hseStats: MeetingHseStats;
   canWrite: boolean;
 }) {
   const t = useTranslations("amu");
@@ -53,18 +60,38 @@ export function AmuMeetingsPanel({
 
   async function genAgenda(meetingId: string) {
     const supabase = createSupabaseBrowserClient();
-    await supabase.rpc("generate_statutory_amu_agenda", { p_meeting_id: meetingId });
+    const { error } = await supabase.rpc("generate_statutory_amu_agenda", { p_meeting_id: meetingId });
+    if (error) window.alert(error.message);
+    else router.refresh();
+  }
+
+  async function adjourn(meetingId: string) {
+    if (!window.confirm(t("adjournConfirm"))) return;
+    const supabase = createSupabaseBrowserClient();
+    await supabase
+      .from("work_council_meetings")
+      .update({ status: "completed", adjourned_at: new Date().toISOString() })
+      .eq("id", meetingId);
     router.refresh();
   }
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-        <p className="text-sm text-[var(--color-text)]">
-          <span className="font-semibold">{t("hseStatsOpen")}</span> {hseOpenCount}
-        </p>
-        <p className="mt-1 text-xs text-[var(--color-text-muted)]">{t("hseStatsHint")}</p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <p className="text-xs font-medium text-[var(--color-text-muted)]">{t("hseStatsOpen")}</p>
+          <p className="mt-1 text-2xl font-semibold text-[var(--color-text)]">{hseStats.open}</p>
+        </div>
+        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <p className="text-xs font-medium text-[var(--color-text-muted)]">{t("hseStatsIncidents")}</p>
+          <p className="mt-1 text-2xl font-semibold text-[var(--color-text)]">{hseStats.incident}</p>
+        </div>
+        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <p className="text-xs font-medium text-[var(--color-text-muted)]">{t("hseStatsRos")}</p>
+          <p className="mt-1 text-2xl font-semibold text-[var(--color-text)]">{hseStats.risk_assessment}</p>
+        </div>
       </div>
+      <p className="text-xs text-[var(--color-text-muted)]">{t("hseStatsHint")}</p>
 
       {canWrite ? (
         <form onSubmit={createMeeting} className="rounded-[var(--radius-lg)] border border-[var(--color-border)] p-4">
@@ -87,33 +114,43 @@ export function AmuMeetingsPanel({
         </form>
       ) : null}
 
-      <ul className="space-y-3">
+      <ul className="space-y-4">
         {meetings.map((m) => {
           const ttl = m.title?.en ?? m.title?.nb ?? "—";
           return (
-            <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
-              <div>
-                <p className="font-medium text-[var(--color-text)]">{ttl}</p>
-                <p className="text-xs text-[var(--color-text-muted)]">
-                  {m.scheduled_at ? new Date(m.scheduled_at).toLocaleString() : t("noDate")} · {m.status}
-                </p>
+            <li key={m.id} className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <p className="font-medium text-[var(--color-text)]">{ttl}</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    {m.scheduled_at ? new Date(m.scheduled_at).toLocaleString() : t("noDate")} · {m.status}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  {canWrite ? (
+                    <>
+                      <button type="button" onClick={() => genAgenda(m.id)} className="font-medium text-[var(--color-primary)] hover:underline">
+                        {t("generateAgenda")}
+                      </button>
+                      {m.status !== "completed" ? (
+                        <button type="button" onClick={() => adjourn(m.id)} className="font-medium text-[var(--color-text-secondary)] hover:underline">
+                          {t("adjournMeeting")}
+                        </button>
+                      ) : null}
+                    </>
+                  ) : null}
+                </div>
               </div>
-              {canWrite ? (
-                <button
-                  type="button"
-                  onClick={() => genAgenda(m.id)}
-                  className="text-xs font-medium text-[var(--color-primary)] hover:underline"
-                >
-                  {t("generateAgenda")}
-                </button>
-              ) : null}
+              <div className="mt-4 border-t border-[var(--color-border)] pt-3">
+                <p className="mb-2 text-xs font-semibold text-[var(--color-text)]">{t("minutesHeading")}</p>
+                <AmuMeetingMinutesEditor meetingId={m.id} initialMinutes={m.minutes_document} canWrite={canWrite} />
+              </div>
+              <p className="mt-3 text-xs text-[var(--color-text-muted)]">{t("protocolVaultHint")}</p>
             </li>
           );
         })}
       </ul>
       {meetings.length === 0 ? <p className="text-sm text-[var(--color-text-muted)]">{t("meetingsEmpty")}</p> : null}
-
-      <p className="text-xs text-[var(--color-text-muted)]">{t("minutesEditorHint")}</p>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { getUserOrgContext } from "@/lib/org/server";
 import { userCanAmuWrite } from "@/lib/amu/server-access";
 import { AmuSubnav } from "@/components/amu/amu-subnav";
 import { AmuResolutionsBoard } from "@/components/amu/amu-resolutions-board";
+import { getOrganizationMembersWithRoles } from "@/lib/amu/org-members";
 
 export default async function AmuResolutionsPage() {
   const t = await getTranslations("amu");
@@ -24,6 +25,12 @@ export default async function AmuResolutionsPage() {
     .eq("organization_id", org.organizationId)
     .order("created_at", { ascending: false });
 
+  const rawMembers = await getOrganizationMembersWithRoles(org.organizationId);
+  const members = rawMembers.map((m) => ({
+    user_id: m.user_id,
+    label: m.role_code ? `${m.role_code} · ${m.user_id.slice(0, 8)}…` : `${m.user_id.slice(0, 8)}…`,
+  }));
+
   return (
     <AppShell title={t("resolutionsTitle")}>
       <AmuSubnav />
@@ -31,7 +38,12 @@ export default async function AmuResolutionsPage() {
       {error && error.code === "42P01" ? (
         <p className="text-sm text-amber-800">{t("migrationHint")}</p>
       ) : (
-        <AmuResolutionsBoard organizationId={org.organizationId} resolutions={(resolutions ?? []) as never[]} canWrite={canWrite} />
+        <AmuResolutionsBoard
+          organizationId={org.organizationId}
+          resolutions={(resolutions ?? []) as never[]}
+          members={members}
+          canWrite={canWrite}
+        />
       )}
     </AppShell>
   );

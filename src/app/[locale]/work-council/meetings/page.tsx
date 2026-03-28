@@ -30,6 +30,18 @@ export default async function AmuMeetingsPage() {
     .eq("organization_id", org.organizationId)
     .eq("status", "open");
 
+  const { count: hseIncident } = await supabase
+    .from("hse_records")
+    .select("*", { count: "exact", head: true })
+    .eq("organization_id", org.organizationId)
+    .eq("record_type", "incident");
+
+  const { count: hseRos } = await supabase
+    .from("hse_records")
+    .select("*", { count: "exact", head: true })
+    .eq("organization_id", org.organizationId)
+    .eq("record_type", "risk_assessment");
+
   return (
     <AppShell title={t("meetingsTitle")}>
       <AmuSubnav />
@@ -37,7 +49,11 @@ export default async function AmuMeetingsPage() {
       <AmuMeetingsPanel
         organizationId={org.organizationId}
         meetings={(meetings ?? []) as never[]}
-        hseOpen={hseOpen ?? 0}
+        hseStats={{
+          open: hseOpen ?? 0,
+          incident: hseIncident ?? 0,
+          risk_assessment: hseRos ?? 0,
+        }}
         canWrite={canWrite}
       />
     </AppShell>

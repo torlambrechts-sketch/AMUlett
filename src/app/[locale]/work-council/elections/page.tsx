@@ -18,11 +18,33 @@ export default async function AmuElectionsPage() {
 
   const canWrite = await userCanAmuWrite(org.organizationId);
 
-  const { data: elections, error } = await supabase
+  await supabase.rpc("auto_close_due_amu_elections", { p_organization_id: org.organizationId });
+
+  const { data: electionRows, error } = await supabase
     .from("amu_elections")
-    .select("id, title, phase, protocol")
+    .select("id, title, phase, protocol, nomination_ends_at, voting_ends_at, term_label")
     .eq("organization_id", org.organizationId)
     .order("created_at", { ascending: false });
+
+  const elections =
+    electionRows?.map((e) => ({
+      ...e,
+      nominees: [] as { id: string; user_id: string; status: string }[],
+    })) ?? [];
+
+  if (elections.length) {
+    const ids = elections.map((e) => e.id);
+    const { data: nomRows } = await supabase.from("amu_election_nominees").select("id, election_id, user_id, status").in("election_id", ids);
+    const byE = new Map<string, typeof elections[0]["nominees"]>();
+    for (const n of nomRows ?? []) {
+      const eid = n.election_id as string;
+      if (!byE.has(eid)) byE.set(eid, []);
+      byE.get(eid)!.push({ id: n.id as string, user_id: n.user_id as string, status: n.status as string });
+    }
+    for (const e of elections) {
+      e.nominees = byE.get(e.id) ?? [];
+    }
+  }
 
   return (
     <AppShell title={t("electionsTitle")}>
@@ -31,7 +53,7 @@ export default async function AmuElectionsPage() {
       {error && error.code === "42P01" ? (
         <p className="text-sm text-amber-800">{t("migrationHint")}</p>
       ) : (
-        <AmuElectionsPanel organizationId={org.organizationId} elections={(elections ?? []) as never[]} canWrite={canWrite} />
+        <AmuElectionsPanel organizationId={org.organizationId} elections={elections as never[]} canWrite={canWrite} />
       )}
     </AppShell>
   );
