@@ -1,9 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { LocaleSwitcher } from "@/components/locale-switcher";
-import { SidebarNav } from "@/components/layout/sidebar-nav";
+import { DesktopSidebar } from "@/components/layout/desktop-sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { SignOutButton } from "@/components/auth/sign-out-button";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function initialsFromEmail(email: string | null): string {
@@ -51,30 +50,16 @@ export async function AppShell({
   const displayName = displayNameFromEmail(userEmail) || userEmail || "";
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 z-30 hidden h-screen w-[var(--sidebar-w)] shrink-0 flex-col bg-[var(--sidebar-bg)] lg:flex">
-        <div className="flex h-[4.25rem] items-center border-b border-[var(--sidebar-border)] px-4">
-          <span className="text-lg font-semibold tracking-tight text-white">AMUlett</span>
-        </div>
-        <div className="flex flex-1 flex-col overflow-hidden pt-3">
-          <SidebarNav />
-        </div>
-        <div className="border-t border-[var(--sidebar-border)] p-4">
-          {userEmail ? (
-            <p className="mb-3 truncate text-xs text-[var(--sidebar-text-muted)]" title={userEmail}>
-              {userEmail}
-            </p>
-          ) : null}
-          <SignOutButton variant="sidebar" />
-          <p className="mt-3 text-xs leading-relaxed text-[var(--sidebar-text-muted)]">{t("sidebarHint")}</p>
-        </div>
-      </aside>
+    <div className="flex min-h-screen bg-[var(--color-bg)]">
+      <DesktopSidebar userEmail={userEmail} />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-40 flex h-[4.25rem] items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-sm)] sm:px-5">
+        <header className="sticky top-0 z-40 flex h-[4.25rem] items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 sm:px-5">
           <MobileNav />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3 lg:gap-4">
-            <BrandLogo />
+            <div className="shrink-0 lg:hidden">
+              <BrandLogo />
+            </div>
             <div className="min-w-0 sm:flex-1">
               <h1 className="truncate text-sm font-semibold tracking-tight text-[var(--color-text)] sm:text-base lg:text-lg">
                 {title}
@@ -121,7 +106,7 @@ export async function AppShell({
           </div>
         </header>
 
-        <main className="flex-1 px-4 py-5 md:px-6 md:py-6 lg:px-8">{children}</main>
+        <main className="flex-1 bg-[var(--color-bg)] px-4 py-5 md:px-6 md:py-6 lg:px-8">{children}</main>
       </div>
     </div>
   );

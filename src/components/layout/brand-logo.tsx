@@ -1,14 +1,25 @@
 import { Link } from "@/i18n/navigation";
 
 /** Generic product mark (replaces third-party branding in reference designs). */
-export function BrandLogo() {
+export function BrandLogo({ variant = "header" }: { variant?: "header" | "prominent" }) {
+  const isProminent = variant === "prominent";
   return (
     <Link
       href="/"
-      className="flex items-center gap-2.5 rounded-[var(--radius-md)] bg-[var(--header-logo-bg)] px-3 py-2 text-white shadow-sm transition hover:brightness-110"
+      className={
+        isProminent
+          ? "flex items-center gap-2.5 rounded-[var(--radius-md)] bg-[var(--header-logo-bg)] px-3 py-2 text-white shadow-sm transition hover:brightness-110"
+          : "flex items-center gap-2 rounded-[var(--radius-md)] px-1 py-1.5 text-[var(--color-text)] transition hover:bg-[var(--color-surface-elevated)]"
+      }
       aria-label="AMUlett home"
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-md bg-white/15">
+      <span
+        className={
+          isProminent
+            ? "flex h-8 w-8 items-center justify-center rounded-md bg-white/15"
+            : "flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary-muted)] text-[var(--color-primary)]"
+        }
+      >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
             d="M12 3L4 9v12h16V9l-8-6z"

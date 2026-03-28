@@ -16,25 +16,40 @@ const items = [
   { href: "/settings", key: "settings" as const, Icon: IconCog },
 ];
 
-export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarNav({
+  onNavigate,
+  collapsed = false,
+}: {
+  onNavigate?: () => void;
+  collapsed?: boolean;
+}) {
   const t = useTranslations("nav");
   const pathname = usePathname();
 
   return (
     <div className="flex h-full flex-col">
-      <SidebarCreateButton onNavigate={onNavigate} />
-      <nav className="flex flex-1 flex-col gap-0.5 px-2" aria-label="Main">
+      <SidebarCreateButton onNavigate={onNavigate} collapsed={collapsed} />
+      <nav
+        className={["flex flex-1 flex-col gap-0.5", collapsed ? "items-center px-1" : "px-2"].join(" ")}
+        aria-label="Main"
+      >
         {items.map(({ href, key, Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const label = t(key);
           return (
             <Link
               key={href}
               href={href}
               onClick={onNavigate}
+              title={collapsed ? label : undefined}
+              aria-label={collapsed ? label : undefined}
               className={[
-                "relative flex items-center gap-3 rounded-[var(--radius-md)] py-2.5 pl-3 pr-2 text-sm font-medium transition-colors",
+                "relative flex items-center rounded-[var(--radius-md)] text-sm font-medium transition-colors",
+                collapsed
+                  ? "h-11 w-11 shrink-0 justify-center p-0"
+                  : "gap-3 py-2.5 pl-3 pr-2",
                 active
-                  ? "bg-[var(--sidebar-active-bg)] text-white"
+                  ? "bg-[var(--sidebar-active-bg)] text-[var(--color-primary)] shadow-sm"
                   : "text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]",
               ].join(" ")}
             >
@@ -45,19 +60,24 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                 />
               ) : null}
               <Icon className="h-5 w-5 shrink-0 opacity-90" aria-hidden />
-              {t(key)}
+              {collapsed ? <span className="sr-only">{label}</span> : label}
             </Link>
           );
         })}
       </nav>
-      <div className="border-t border-[var(--sidebar-border)] p-2">
+      <div className={["border-t border-[var(--sidebar-border)]", collapsed ? "flex justify-center p-2" : "p-2"].join(" ")}>
         <Link
           href="/learning"
           onClick={onNavigate}
-          className="flex items-center gap-3 rounded-[var(--radius-md)] py-2.5 pl-3 pr-2 text-sm font-medium text-[var(--sidebar-text-muted)] transition-colors hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
+          title={collapsed ? t("helpCenter") : undefined}
+          aria-label={collapsed ? t("helpCenter") : undefined}
+          className={[
+            "flex items-center rounded-[var(--radius-md)] text-sm font-medium text-[var(--sidebar-text-muted)] transition-colors hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]",
+            collapsed ? "h-11 w-11 shrink-0 justify-center p-0" : "gap-3 py-2.5 pl-3 pr-2",
+          ].join(" ")}
         >
           <IconHelp className="h-5 w-5 shrink-0" />
-          {t("helpCenter")}
+          {collapsed ? <span className="sr-only">{t("helpCenter")}</span> : t("helpCenter")}
         </Link>
       </div>
     </div>

@@ -1,5 +1,8 @@
 {
   "nav": {
+    "appName": "AMUlett",
+    "collapseMenu": "Skjul meny",
+    "expandMenu": "Vis meny",
     "createNew": "Opprett ny",
     "helpCenter": "Hjelpesenter",
     "notifications": "Varsler",

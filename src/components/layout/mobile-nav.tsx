@@ -37,9 +37,9 @@ export function MobileNav() {
             aria-label="Close menu"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute left-0 top-0 flex h-full w-[min(100%,288px)] flex-col bg-[var(--sidebar-bg)] shadow-xl">
+          <div className="absolute left-0 top-0 flex h-full w-[min(100%,288px)] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] shadow-xl">
             <div className="flex items-center justify-between border-b border-[var(--sidebar-border)] px-4 py-3">
-              <span className="text-base font-semibold text-white">AMUlett</span>
+              <span className="text-base font-semibold tracking-tight text-[var(--sidebar-text)]">AMUlett</span>
               <button
                 type="button"
                 className="rounded-[var(--radius-sm)] p-2 text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover)]"

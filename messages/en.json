@@ -1,5 +1,8 @@
 {
   "nav": {
+    "appName": "AMUlett",
+    "collapseMenu": "Collapse menu",
+    "expandMenu": "Expand menu",
     "createNew": "Create new",
     "helpCenter": "Help center",
     "notifications": "Notifications",
