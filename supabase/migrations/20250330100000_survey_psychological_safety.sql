@@ -244,6 +244,7 @@ declare
   v_n int;
   v_min int := 5;
   v_parent uuid;
+  v_parent_n int;
   v_enps_score int;
   v_enps_qid uuid;
   v_promoters numeric;
