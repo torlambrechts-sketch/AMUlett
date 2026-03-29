@@ -71,6 +71,8 @@ Never commit the database password or service role key; keep them only in GitHub
 
 **LMS system courses:** migration `20250326220000_learning_lms.sql` adds `learning_courses.scope` (`system_default` vs `organization`) and `platform_admins`. Insert your user id into `platform_admins` (as postgres) to author default courses for all organizations.
 
+**Sample default course (Norwegian Labour Law for Leaders):** after migrations, run `supabase/seed_norwegian_labour_law_leaders_course.sql` in the SQL editor (as `postgres`). It re-seeds fixed id `a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11` with every LMS block type (rich text, video, flash cards, quizzes including bank/random and matching, image gallery, PDF, SCORM/xAPI placeholder, H5P embed, assignment, forum link, etc.).
+
 If the app reports **Could not find the 'scope' column** (or similar schema cache errors), the migration has not been applied to that Supabase project yet—run `supabase/migrations/20250326220000_learning_lms.sql` (or the full `ALL_MIGRATIONS.sql` on a new project). Course **slugs** are generated in the app from the title; users do not enter them.
 
 They define:
