@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { userIsSafetyRep } from "@/lib/amu/server-access";
 import { HseNewRecordForm } from "@/components/hse/hse-new-record-form";
+import { HsePageHeader } from "@/components/hse/hse-page-header";
 
 export default async function HseHaltPage() {
   const t = await getTranslations("modules");
@@ -19,8 +20,8 @@ export default async function HseHaltPage() {
   const isVo = await userIsSafetyRep(org.organizationId);
 
   return (
-    <AppShell title={`${t("hse")} — ${th("haltTitle")}`}>
-      <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{th("haltIntro")}</p>
+    <AppShell title={`${t("hse")} — ${th("haltTitle")}`} hideHeaderTitle mainClassName="!p-0">
+      <HsePageHeader title={th("haltTitle")} subtitle={th("haltIntro")} />
       <HseNewRecordForm organizationId={org.organizationId} kind="halted_work" allowHaltWork={isVo} />
     </AppShell>
   );

@@ -6,6 +6,7 @@ import { getUserOrgContext } from "@/lib/org/server";
 import { userIsSafetyRep } from "@/lib/amu/server-access";
 import { HseRecordTable } from "@/components/hse/hse-record-table";
 import { HseNewRecordForm } from "@/components/hse/hse-new-record-form";
+import { HsePageHeader } from "@/components/hse/hse-page-header";
 
 export default async function HseDeviationsPage() {
   const t = await getTranslations("modules");
@@ -28,8 +29,8 @@ export default async function HseDeviationsPage() {
     .limit(80);
 
   return (
-    <AppShell title={`${t("hse")} — ${th("deviationsTitle")}`}>
-      <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{th("deviationsIntro")}</p>
+    <AppShell title={`${t("hse")} — ${th("deviationsTitle")}`} hideHeaderTitle mainClassName="!p-0">
+      <HsePageHeader title={th("deviationsTitle")} subtitle={th("deviationsIntro")} />
 
       <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-secondary)]">{th("newDeviation")}</h2>
       <div className="mb-10">

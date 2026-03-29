@@ -1,11 +1,12 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { Suspense } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { userIsSafetyRep } from "@/lib/amu/server-access";
-import { HseRecordTable } from "@/components/hse/hse-record-table";
+import { HseDashboardClient } from "@/components/hse/hse-dashboard-client";
+import type { HseCardRecord } from "@/components/hse/hse-record-card-grid";
 
 export default async function HsePage() {
   const t = await getTranslations("modules");
@@ -24,7 +25,7 @@ export default async function HsePage() {
     .select("id, record_type, title, status, risk_band, risk_score, action_plan_required, escalated_to_amu")
     .eq("organization_id", org.organizationId)
     .order("created_at", { ascending: false })
-    .limit(12);
+    .limit(48);
 
   const { count: openCount } = await supabase
     .from("hse_records")
@@ -38,54 +39,28 @@ export default async function HsePage() {
     .eq("organization_id", org.organizationId)
     .eq("record_type", "risk_assessment");
 
+  const cards: HseCardRecord[] = (recent ?? []).map((r) => ({
+    id: r.id,
+    record_type: r.record_type,
+    title: r.title,
+    status: r.status,
+    risk_band: r.risk_band,
+    risk_score: r.risk_score,
+    action_plan_required: r.action_plan_required,
+    escalated_to_amu: r.escalated_to_amu,
+  }));
+
   return (
-    <AppShell title={t("hse")}>
-      <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("hsePlaceholder")}</p>
-
-      {isVo ? (
-        <div className="mb-6 rounded-[var(--radius-lg)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
-          {th("voHint")}
-        </div>
-      ) : null}
-
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-muted)]">{th("statOpen")}</p>
-          <p className="mt-1 text-2xl font-semibold">{openCount ?? 0}</p>
-        </div>
-        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-muted)]">{th("statRos")}</p>
-          <p className="mt-1 text-2xl font-semibold">{rosCount ?? 0}</p>
-        </div>
-        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-muted)]">{th("quickLinks")}</p>
-          <ul className="mt-2 space-y-1 text-sm">
-            <li>
-              <Link href="/hse/ros" className="text-[var(--color-primary)] hover:underline">
-                {th("navRos")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/hse/deviations" className="text-[var(--color-primary)] hover:underline">
-                {th("navDeviations")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/hse/inspections" className="text-[var(--color-primary)] hover:underline">
-                {th("navInspections")}
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-secondary)]">{th("recentRecords")}</h2>
-      <HseRecordTable
-        records={(recent ?? []) as never}
-        emptyMessage={th("emptyRecords")}
-        showRisk
-        showAmu={isVo}
-      />
+    <AppShell title={t("hse")} hideHeaderTitle mainClassName="!p-0">
+      <Suspense fallback={<div className="p-6 text-sm text-[#6b7280]">{th("loading")}</div>}>
+        <HseDashboardClient
+          records={cards}
+          openCount={openCount ?? 0}
+          rosCount={rosCount ?? 0}
+          isVo={isVo}
+          voHint={th("voHint")}
+        />
+      </Suspense>
     </AppShell>
   );
 }

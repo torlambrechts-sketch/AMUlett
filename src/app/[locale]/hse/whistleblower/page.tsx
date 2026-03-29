@@ -4,6 +4,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { WhistleblowerForm } from "@/components/hse/whistleblower-form";
+import { HsePageHeader } from "@/components/hse/hse-page-header";
 
 export default async function HseWhistleblowerPage() {
   const t = await getTranslations("modules");
@@ -43,8 +44,8 @@ export default async function HseWhistleblowerPage() {
   }
 
   return (
-    <AppShell title={`${t("hse")} — ${th("whistleblowerTitle")}`}>
-      <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{th("whistleblowerIntro")}</p>
+    <AppShell title={`${t("hse")} — ${th("whistleblowerTitle")}`} hideHeaderTitle mainClassName="!p-0">
+      <HsePageHeader title={th("whistleblowerTitle")} subtitle={th("whistleblowerIntro")} />
 
       <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-secondary)]">{th("whistleblowerNew")}</h2>
       <div className="mb-10">

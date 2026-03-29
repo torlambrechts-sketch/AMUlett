@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { resolveLocalized } from "@/lib/learning/localize";
 import { HseInspectionRun } from "@/components/hse/hse-inspection-run";
+import { HsePageHeader } from "@/components/hse/hse-page-header";
 
 type TemplateRow = {
   id: string;
@@ -38,8 +39,8 @@ export default async function HseInspectionsPage() {
     .limit(15);
 
   return (
-    <AppShell title={`${t("hse")} — ${th("inspectionsTitle")}`}>
-      <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{th("inspectionsIntro")}</p>
+    <AppShell title={`${t("hse")} — ${th("inspectionsTitle")}`} hideHeaderTitle mainClassName="!p-0">
+      <HsePageHeader title={th("inspectionsTitle")} subtitle={th("inspectionsIntro")} />
 
       <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-secondary)]">{th("templatesHeading")}</h2>
       <div className="mb-10 space-y-8">

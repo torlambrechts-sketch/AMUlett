@@ -9,8 +9,10 @@ import { WikiPageTree, type WikiTreeNode } from "@/components/wiki/wiki-page-tre
 import { userCanWikiWrite, userIsOrgAdmin } from "@/lib/wiki/server-access";
 import { getOrCreateDefaultWikiSpace } from "@/lib/wiki/get-default-space";
 import { DocumentLibraryUpload } from "@/components/documents/document-library-upload";
-import { DocumentLibraryFilters } from "@/components/documents/document-library-filters";
-import { DocumentLibraryTable, type LibraryRow, type WikiLibraryRow, type FileLibraryRow } from "@/components/documents/document-library-table";
+import { DocumentHubHero } from "@/components/documents/document-hub-hero";
+import { DocumentLibraryChipFilters } from "@/components/documents/document-library-chip-filters";
+import { DocumentLibraryCardGrid } from "@/components/documents/document-library-card-grid";
+import { type LibraryRow, type WikiLibraryRow, type FileLibraryRow } from "@/components/documents/document-library-table";
 import { DocumentsPdLayout } from "@/components/documents/documents-pd-layout";
 import { isLibraryCategory, type LibraryCategory } from "@/lib/documents/library-categories";
 
@@ -137,7 +139,7 @@ export default async function DocumentsHubPage({ searchParams }: Props) {
 
   if (!spaceId) {
     return (
-      <AppShell title={t("title")} mainClassName="!p-0">
+      <AppShell title={t("title")} hideHeaderTitle mainClassName="!p-0">
         <DocumentsPdLayout>
           <div className="p-4 md:p-0">
             <p className="text-sm text-red-600">
@@ -155,7 +157,7 @@ export default async function DocumentsHubPage({ searchParams }: Props) {
 
   if (!space) {
     return (
-      <AppShell title={t("title")} mainClassName="!p-0">
+      <AppShell title={t("title")} hideHeaderTitle mainClassName="!p-0">
         <DocumentsPdLayout>
           <div className="p-4 md:p-0">
             <p className="text-sm text-[var(--color-text-muted)]">{t("noSpace")}</p>
@@ -248,27 +250,31 @@ export default async function DocumentsHubPage({ searchParams }: Props) {
       : [];
 
   return (
-    <AppShell title={t("title")} mainClassName="!p-0">
+    <AppShell title={t("title")} hideHeaderTitle mainClassName="!p-0">
       <DocumentsPdLayout>
         <div>
-          <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("intro")}</p>
+          <DocumentHubHero
+            title={t("hubHeroTitle")}
+            subtitle={t("hubHeroSubtitle")}
+            addHref={`/documents/s/${space.slug}/new`}
+            showAdd={canWrite}
+            addLabel={t("hubAddResources")}
+          />
 
           <section className="mb-10">
-        <h2 className="mb-3 text-base font-semibold text-[var(--color-text)]">{t("libraryTitle")}</h2>
-        <p className="mb-4 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("libraryIntro")}</p>
-        {fileErr && fileErr.code !== "42P01" ? (
-          <p className="mb-4 rounded-[var(--radius-md)] border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
-            {t("libraryDbHint")}
-          </p>
-        ) : null}
-        {canWrite ? <DocumentLibraryUpload organizationId={org.organizationId} /> : null}
-        <div className="mt-4">
-          <DocumentLibraryFilters />
-        </div>
-        <div className="mt-4">
-          <DocumentLibraryTable spaceSlug={space.slug} locale={locale} rows={libraryRows} canWrite={canWrite} />
-        </div>
-      </section>
+            {fileErr && fileErr.code !== "42P01" ? (
+              <p className="mb-4 rounded-[var(--radius-md)] border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
+                {t("libraryDbHint")}
+              </p>
+            ) : null}
+            {canWrite ? (
+              <div className="mb-6">
+                <DocumentLibraryUpload organizationId={org.organizationId} />
+              </div>
+            ) : null}
+            <DocumentLibraryChipFilters />
+            <DocumentLibraryCardGrid spaceSlug={space.slug} locale={locale} rows={libraryRows} canWrite={canWrite} />
+          </section>
 
       {favoriteRows.length > 0 ? (
         <section className="mb-8">

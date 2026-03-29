@@ -7,7 +7,8 @@ import { userIsSafetyRep } from "@/lib/amu/server-access";
 import { userCanWriteHse } from "@/lib/hse/server-access";
 import { getOrganizationMembersWithRoles } from "@/lib/amu/org-members";
 import { HseRecordDetailClient, type HseRecordDetail } from "@/components/hse/hse-record-detail-client";
-import Link from "next/link";
+import { HsePageHeader } from "@/components/hse/hse-page-header";
+import { Link } from "@/i18n/navigation";
 
 type Params = { recordId: string };
 
@@ -65,10 +66,12 @@ export default async function HseRecordPage({ params }: { params: Promise<Params
   const canReleaseHalt = isVo && record.record_type === "halted_work";
 
   return (
-    <AppShell title={`${t("hse")} — ${th("recordDetail")}`}>
-      <Link href="/hse" className="mb-6 inline-block text-sm text-[var(--color-primary)] hover:underline">
+    <AppShell title={`${t("hse")} — ${th("recordDetail")}`} hideHeaderTitle mainClassName="!p-0">
+      <Link href="/hse" className="mb-4 inline-block text-sm font-medium text-[#1d4e5b] hover:underline">
         ← {th("backToHse")}
       </Link>
+
+      <HsePageHeader title={th("recordDetail")} />
 
       <HseRecordDetailClient
         record={record}

@@ -1,10 +1,5 @@
-import { HseSubnav } from "@/components/hse/hse-subnav";
+import { HsePdWrapper } from "@/components/hse/hse-pd-wrapper";
 
 export default function HseLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div>
-      <HseSubnav />
-      {children}
-    </div>
-  );
+  return <HsePdWrapper>{children}</HsePdWrapper>;
 }
