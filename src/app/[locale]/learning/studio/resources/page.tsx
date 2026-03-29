@@ -19,7 +19,7 @@ export default async function ResourceLibraryPage() {
   }
 
   return (
-    <AppShell title={t("resourceLibraryTitle")} learningLayout="iconRail" mainClassName="!p-0">
+    <AppShell title={t("resourceLibraryTitle")} learningLayout="learning" mainClassName="!p-0">
       <LearningPdLayout>
       <Link href="/learning/studio" className="mb-6 inline-block text-sm text-[var(--color-primary)] hover:underline">
         ← {t("backToStudio")}

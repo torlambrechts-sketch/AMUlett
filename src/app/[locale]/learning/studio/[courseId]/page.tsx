@@ -76,7 +76,7 @@ export default async function StudioCoursePage({ params }: Props) {
     <AppShell
       title={`${t("studioTitle")}: ${shell.title}`}
       titleLocaleNote={shell.titleLocaleNote}
-      learningLayout="iconRail"
+      learningLayout="learning"
       mainClassName="!p-0"
     >
       <LearningPdLayout>

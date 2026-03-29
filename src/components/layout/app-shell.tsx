@@ -40,8 +40,8 @@ export async function AppShell({
   mainClassName?: string;
   /** Hide the page title in the top bar (page supplies its own heading). */
   hideHeaderTitle?: boolean;
-  /** Narrow icon rail + PandaDoc-style header for e-learning. */
-  learningLayout?: "iconRail";
+  /** Full collapsible sidebar + PandaDoc-style header for e-learning (expanded shows labels and sidebar search). */
+  learningLayout?: "learning";
   children: React.ReactNode;
 }) {
   const t = await getTranslations("nav");
@@ -58,16 +58,16 @@ export async function AppShell({
   const initials = initialsFromEmail(userEmail);
   const displayName = displayNameFromEmail(userEmail) || userEmail || "";
 
-  const isLearningRail = learningLayout === "iconRail";
+  const isLearningShell = learningLayout === "learning";
 
   return (
     <div className="flex min-h-screen">
-      <DesktopSidebar userEmail={userEmail} variant={isLearningRail ? "iconRail" : "default"} />
+      <DesktopSidebar userEmail={userEmail} variant={isLearningShell ? "learning" : "default"} />
 
       <div className="flex min-w-0 flex-1 flex-col bg-[var(--workspace-bg)]">
         <header
           className={
-            isLearningRail
+            isLearningShell
               ? "sticky top-0 z-40 flex min-h-[3.75rem] items-center gap-2 border-b border-[#e8eaed] bg-white px-3 py-2.5 sm:gap-3 sm:px-5"
               : "sticky top-0 z-40 flex h-[4.25rem] items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 sm:px-5"
           }
@@ -84,7 +84,7 @@ export async function AppShell({
                 <>
                   <h1
                     className={
-                      isLearningRail
+                      isLearningShell
                         ? "truncate text-base font-semibold text-[#1a1d21] sm:text-lg"
                         : "truncate text-sm font-semibold tracking-tight text-[var(--color-text)] sm:text-base lg:text-lg"
                     }
@@ -94,7 +94,7 @@ export async function AppShell({
                   {titleLocaleNote ? (
                     <p
                       className={
-                        isLearningRail
+                        isLearningShell
                           ? "mt-0.5 truncate text-xs text-amber-800"
                           : "mt-0.5 truncate text-xs text-amber-800 dark:text-amber-200/90"
                       }
@@ -113,7 +113,7 @@ export async function AppShell({
                 type="search"
                 placeholder={searchPh}
                 className={
-                  isLearningRail
+                  isLearningShell
                     ? "h-9 w-44 rounded-full border border-[#e8eaed] bg-[#f7f8f9] px-4 text-sm text-[#1a1d21] placeholder:text-[#6b7280] xl:w-56"
                     : "h-9 w-44 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] xl:w-56"
                 }
@@ -125,7 +125,7 @@ export async function AppShell({
             <button
               type="button"
               className={
-                isLearningRail
+                isLearningShell
                   ? "hidden h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[#6b7280] hover:bg-[#f7f8f9] sm:flex"
                   : "hidden h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] sm:flex"
               }
@@ -140,7 +140,7 @@ export async function AppShell({
             <div className="flex items-center gap-2 pl-1">
               <div
                 className={
-                  isLearningRail
+                  isLearningShell
                     ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgba(45,142,82,0.14)] text-xs font-semibold text-[#2d8e52]"
                     : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-muted)] text-xs font-semibold text-[var(--color-primary)]"
                 }
@@ -158,7 +158,7 @@ export async function AppShell({
         <main
           className={[
             "flex-1 bg-[var(--workspace-bg)]",
-            isLearningRail ? "p-4 md:p-6 lg:p-8" : "px-4 py-5 md:px-6 md:py-6 lg:px-8",
+            isLearningShell ? "p-4 md:p-6 lg:p-8" : "px-4 py-5 md:px-6 md:py-6 lg:px-8",
             mainClassName ?? "",
           ].join(" ")}
         >

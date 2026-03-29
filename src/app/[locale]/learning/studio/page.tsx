@@ -23,7 +23,7 @@ export default async function LearningStudioPage() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
     return (
-      <AppShell title={t("studioTitle")} learningLayout="iconRail" mainClassName="!p-0">
+      <AppShell title={t("studioTitle")} learningLayout="learning" mainClassName="!p-0">
         <LearningPdLayout>
           <p className="text-sm text-[var(--color-text-muted)]">Supabase not configured.</p>
         </LearningPdLayout>
@@ -65,7 +65,7 @@ export default async function LearningStudioPage() {
   }
 
   return (
-    <AppShell title={t("studioTitle")} learningLayout="iconRail" mainClassName="!p-0">
+    <AppShell title={t("studioTitle")} learningLayout="learning" mainClassName="!p-0">
       <LearningPdLayout>
       <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("studioIntro")}</p>
       <div className="mb-6 flex flex-wrap gap-3">

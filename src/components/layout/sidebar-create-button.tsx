@@ -6,18 +6,24 @@ import { Link } from "@/i18n/navigation";
 export function SidebarCreateButton({
   onNavigate,
   collapsed = false,
+  href = "/settings",
+  label: labelOverride,
 }: {
   onNavigate?: () => void;
   collapsed?: boolean;
+  /** Primary action target (e.g. course studio on learning routes). */
+  href?: string;
+  /** Override visible label (default: nav.createNew). */
+  label?: string;
 }) {
   const t = useTranslations("nav");
-  const label = t("createNew");
+  const label = labelOverride ?? t("createNew");
 
   if (collapsed) {
     return (
       <div className="mb-4 flex justify-center px-1">
         <Link
-          href="/settings"
+          href={href}
           onClick={onNavigate}
           title={label}
           aria-label={label}
@@ -33,7 +39,7 @@ export function SidebarCreateButton({
 
   return (
     <Link
-      href="/settings"
+      href={href}
       onClick={onNavigate}
       className="mx-3 mb-4 flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-3 py-2.5 text-sm font-semibold text-[var(--color-primary-fg)] shadow-md transition hover:bg-[var(--color-primary-hover)]"
     >

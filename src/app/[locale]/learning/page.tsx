@@ -41,7 +41,7 @@ export default async function LearningPage() {
   return (
     <AppShell
       title={t("catalogTitle")}
-      learningLayout="iconRail"
+      learningLayout="learning"
       mainClassName="learning-pd-workspace !p-0"
     >
       {!org ? (

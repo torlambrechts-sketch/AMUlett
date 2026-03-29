@@ -7,7 +7,7 @@ export default async function NewCoursePage() {
   const t = await getTranslations("lms");
 
   return (
-    <AppShell title={t("newCourseTitle")} learningLayout="iconRail" mainClassName="!p-0">
+    <AppShell title={t("newCourseTitle")} learningLayout="learning" mainClassName="!p-0">
       <LearningPdLayout>
         <NewCourseForm />
       </LearningPdLayout>
