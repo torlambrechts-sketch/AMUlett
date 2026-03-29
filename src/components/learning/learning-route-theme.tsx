@@ -2,19 +2,16 @@
 
 import { useEffect } from "react";
 
-const SIDEBAR_BG = "#004cfe";
-const SIDEBAR_PREV = "#001a3d";
+const HTML_CLASS = "learning-ui";
 
 /**
- * While mounted, aligns the shell sidebar with the ActiveCampaign-style learning palette.
+ * Applies PandaDoc-inspired shell tokens (light rail + beige workspace) for /learning routes.
  */
 export function LearningRouteTheme() {
   useEffect(() => {
-    const root = document.documentElement;
-    const before = root.style.getPropertyValue("--sidebar-bg");
-    root.style.setProperty("--sidebar-bg", SIDEBAR_BG);
+    document.documentElement.classList.add(HTML_CLASS);
     return () => {
-      root.style.setProperty("--sidebar-bg", before || SIDEBAR_PREV);
+      document.documentElement.classList.remove(HTML_CLASS);
     };
   }, []);
 

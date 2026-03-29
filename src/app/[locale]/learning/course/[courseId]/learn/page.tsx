@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
+import { LearningPdLayout } from "@/components/learning/learning-pd-layout";
 import { Link } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
@@ -117,7 +118,8 @@ export default async function CourseLearnPage({ params }: Props) {
   const gamificationEnabled = Boolean(settings.gamificationEnabled);
 
   return (
-    <AppShell title={shell.title} titleLocaleNote={shell.titleLocaleNote}>
+    <AppShell title={shell.title} titleLocaleNote={shell.titleLocaleNote} learningLayout="iconRail" mainClassName="!p-0">
+      <LearningPdLayout>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
         <Link href={`/learning/course/${courseId}`} className="text-sm text-[var(--color-primary)] hover:underline">
           {t("courseOverview")}
@@ -137,6 +139,7 @@ export default async function CourseLearnPage({ params }: Props) {
         certificate={cert}
         gamificationEnabled={gamificationEnabled}
       />
+      </LearningPdLayout>
     </AppShell>
   );
 }

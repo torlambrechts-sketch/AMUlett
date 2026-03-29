@@ -30,6 +30,7 @@ export async function AppShell({
   titleLocaleNote,
   mainClassName,
   hideHeaderTitle,
+  learningLayout,
   children,
 }: {
   title: string;
@@ -39,6 +40,8 @@ export async function AppShell({
   mainClassName?: string;
   /** Hide the page title in the top bar (page supplies its own heading). */
   hideHeaderTitle?: boolean;
+  /** Narrow icon rail + PandaDoc-style header for e-learning. */
+  learningLayout?: "iconRail";
   children: React.ReactNode;
 }) {
   const t = await getTranslations("nav");
@@ -55,12 +58,20 @@ export async function AppShell({
   const initials = initialsFromEmail(userEmail);
   const displayName = displayNameFromEmail(userEmail) || userEmail || "";
 
+  const isLearningRail = learningLayout === "iconRail";
+
   return (
     <div className="flex min-h-screen">
-      <DesktopSidebar userEmail={userEmail} />
+      <DesktopSidebar userEmail={userEmail} variant={isLearningRail ? "iconRail" : "default"} />
 
       <div className="flex min-w-0 flex-1 flex-col bg-[var(--workspace-bg)]">
-        <header className="sticky top-0 z-40 flex h-[4.25rem] items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 sm:px-5">
+        <header
+          className={
+            isLearningRail
+              ? "sticky top-0 z-40 flex min-h-[3.75rem] items-center gap-2 border-b border-[#e8eaed] bg-white px-3 py-2.5 sm:gap-3 sm:px-5"
+              : "sticky top-0 z-40 flex h-[4.25rem] items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 sm:px-5"
+          }
+        >
           <MobileNav />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3 lg:gap-4">
             <div className="shrink-0 lg:hidden">
@@ -71,11 +82,25 @@ export async function AppShell({
                 <h1 className="sr-only">{title}</h1>
               ) : (
                 <>
-                  <h1 className="truncate text-sm font-semibold tracking-tight text-[var(--color-text)] sm:text-base lg:text-lg">
+                  <h1
+                    className={
+                      isLearningRail
+                        ? "truncate text-base font-semibold text-[#1a1d21] sm:text-lg"
+                        : "truncate text-sm font-semibold tracking-tight text-[var(--color-text)] sm:text-base lg:text-lg"
+                    }
+                  >
                     {title}
                   </h1>
                   {titleLocaleNote ? (
-                    <p className="mt-0.5 truncate text-xs text-amber-800 dark:text-amber-200/90">{titleLocaleNote}</p>
+                    <p
+                      className={
+                        isLearningRail
+                          ? "mt-0.5 truncate text-xs text-amber-800"
+                          : "mt-0.5 truncate text-xs text-amber-800 dark:text-amber-200/90"
+                      }
+                    >
+                      {titleLocaleNote}
+                    </p>
                   ) : null}
                 </>
               )}
@@ -87,7 +112,11 @@ export async function AppShell({
               <input
                 type="search"
                 placeholder={searchPh}
-                className="h-9 w-44 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] xl:w-56"
+                className={
+                  isLearningRail
+                    ? "h-9 w-44 rounded-full border border-[#e8eaed] bg-[#f7f8f9] px-4 text-sm text-[#1a1d21] placeholder:text-[#6b7280] xl:w-56"
+                    : "h-9 w-44 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] xl:w-56"
+                }
                 readOnly
                 aria-readonly="true"
                 title="Connect to search when backend is ready"
@@ -95,7 +124,11 @@ export async function AppShell({
             </label>
             <button
               type="button"
-              className="hidden h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] sm:flex"
+              className={
+                isLearningRail
+                  ? "hidden h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[#6b7280] hover:bg-[#f7f8f9] sm:flex"
+                  : "hidden h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] sm:flex"
+              }
               aria-label={t("notifications")}
               title={t("notifications")}
             >
@@ -106,7 +139,11 @@ export async function AppShell({
             <LocaleSwitcher />
             <div className="flex items-center gap-2 pl-1">
               <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-muted)] text-xs font-semibold text-[var(--color-primary)]"
+                className={
+                  isLearningRail
+                    ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgba(45,142,82,0.14)] text-xs font-semibold text-[#2d8e52]"
+                    : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-muted)] text-xs font-semibold text-[var(--color-primary)]"
+                }
                 title={userEmail ?? "Profile"}
               >
                 {initials}
@@ -119,7 +156,11 @@ export async function AppShell({
         </header>
 
         <main
-          className={["flex-1 bg-[var(--workspace-bg)] px-4 py-5 md:px-6 md:py-6 lg:px-8", mainClassName ?? ""].join(" ")}
+          className={[
+            "flex-1 bg-[var(--workspace-bg)]",
+            isLearningRail ? "p-4 md:p-6 lg:p-8" : "px-4 py-5 md:px-6 md:py-6 lg:px-8",
+            mainClassName ?? "",
+          ].join(" ")}
         >
           {children}
         </main>

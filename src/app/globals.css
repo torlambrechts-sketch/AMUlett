@@ -55,18 +55,42 @@ body {
   outline-offset: 2px;
 }
 
-/* E-learning catalog (ActiveCampaign-style reference) */
-.learning-ac-main {
-  --ac-workspace: #f4f7ff;
-  --ac-accent: #004cfe;
-  --ac-text: #171a1f;
-  --ac-muted: #bdc1ca;
-  --ac-border: #9095a1;
-  --ac-video-bg: #0107a9;
-  --ac-chat: #000dff;
-  --ac-card-shadow: 0 0 2px rgb(23 26 31 / 0.12), 0 0 1px rgb(23 26 31 / 0.07);
-  background: var(--ac-workspace) !important;
-  font-family: var(--font-learning-sans), var(--font-sans);
+/* E-learning: PandaDoc-inspired workspace (set via html.learning-ui) */
+html.learning-ui {
+  --workspace-bg: #f9f8f6;
+  --color-primary: #2d8e52;
+  --color-primary-hover: #247a47;
+  --color-primary-muted: rgba(45, 142, 82, 0.14);
+  --color-primary-fg: #ffffff;
+  --sidebar-bg: #f7f8f9;
+  --sidebar-border: #e8eaed;
+  --sidebar-text: #1a1d21;
+  --sidebar-text-secondary: #3d4248;
+  --sidebar-text-muted: #6b7280;
+  --sidebar-hover: rgba(26, 29, 33, 0.06);
+  --sidebar-logo-tint: rgba(45, 142, 82, 0.1);
+  --sidebar-active-bg: rgba(45, 142, 82, 0.12);
+  --sidebar-active-text: #2d8e52;
+  --sidebar-active-bar: #2d8e52;
+}
+
+.learning-pd-workspace {
+  background: var(--workspace-bg);
+}
+
+.learning-pd-card {
+  border-radius: 12px;
+  border: 1px solid rgb(232 234 237);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgb(26 29 33 / 0.06);
+}
+
+.learning-pd-muted {
+  color: #6b7280;
+}
+
+.learning-pd-accent-gold {
+  color: #8e7c3e;
 }
 
 .learning-ac-serif {

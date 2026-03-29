@@ -4,6 +4,7 @@ import { fetchPublishedCatalog } from "@/lib/learning/catalog";
 import { getUserOrgContext } from "@/lib/org/server";
 import { getLearningAccess } from "@/lib/learning/server-access";
 import { LearningAcCatalog } from "@/components/learning/learning-ac-catalog";
+import { LearningSubnavWrapper } from "@/components/learning/learning-subnav-wrapper";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function firstNameFromEmail(email: string | null): string {
@@ -35,20 +36,28 @@ export default async function LearningPage() {
   const rows = [...catalog.system, ...catalog.organization];
   const featured = catalog.system[0] ?? catalog.organization[0] ?? null;
 
+  const canAuthor = access.canAuthorOrg || access.isPlatformAdmin;
+
   return (
-    <AppShell title={t("catalogTitle")} hideHeaderTitle mainClassName="learning-ac-main !bg-[#f4f7ff] !px-0 !py-0 md:!px-0 md:!py-0 lg:!px-0 lg:!py-0">
+    <AppShell
+      title={t("catalogTitle")}
+      learningLayout="iconRail"
+      mainClassName="learning-pd-workspace !p-0"
+    >
       {!org ? (
-        <div className="learning-ac-main px-6 py-10 text-[#171a1f]">
-          <p className="text-sm text-[#9095a1]">{t("needOrg")}</p>
+        <div className="p-6 text-[#6b7280] md:p-8">
+          <p className="text-sm">{t("needOrg")}</p>
         </div>
       ) : (
-        <LearningAcCatalog
-          locale={locale}
-          learnerName={firstName || t("acGuestName")}
-          featured={featured}
-          rows={rows}
-          canAuthor={access.canAuthorOrg || access.isPlatformAdmin}
-        />
+        <LearningSubnavWrapper canAuthor={canAuthor}>
+          <LearningAcCatalog
+            locale={locale}
+            learnerName={firstName || t("acGuestName")}
+            featured={featured}
+            rows={rows}
+            canAuthor={canAuthor}
+          />
+        </LearningSubnavWrapper>
       )}
     </AppShell>
   );

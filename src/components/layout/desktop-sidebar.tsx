@@ -37,7 +37,14 @@ function persistCollapsed(next: boolean) {
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
-export function DesktopSidebar({ userEmail }: { userEmail: string | null }) {
+export function DesktopSidebar({
+  userEmail,
+  variant = "default",
+}: {
+  userEmail: string | null;
+  /** Icon rail (PandaDoc-style): fixed narrow width, icons only. */
+  variant?: "default" | "iconRail";
+}) {
   const t = useTranslations("nav");
   const collapsed = useSyncExternalStore(
     subscribeCollapsed,
@@ -45,28 +52,42 @@ export function DesktopSidebar({ userEmail }: { userEmail: string | null }) {
     () => false,
   );
 
+  const isRail = variant === "iconRail";
+  const widthClass = isRail
+    ? "w-[4.25rem]"
+    : collapsed
+      ? "w-[var(--sidebar-w-collapsed)]"
+      : "w-[var(--sidebar-w)]";
+
   return (
     <aside
       data-collapsed={collapsed ? "true" : "false"}
+      data-variant={variant}
       className={[
         "sticky top-0 z-30 hidden h-screen shrink-0 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] transition-[width] duration-200 ease-out lg:flex",
-        collapsed ? "w-[var(--sidebar-w-collapsed)]" : "w-[var(--sidebar-w)]",
+        widthClass,
       ].join(" ")}
     >
       <div
         className={[
           "flex h-[4.25rem] shrink-0 items-center border-b border-[var(--sidebar-border)]",
-          collapsed ? "justify-center px-2" : "gap-2 px-3",
+          isRail || collapsed ? "justify-center px-2" : "gap-2 px-3",
         ].join(" ")}
       >
-        {collapsed ? (
+        {isRail || collapsed ? (
           <Link
             href="/"
             className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] text-[var(--sidebar-text)] transition hover:bg-[var(--sidebar-hover)]"
             aria-label={t("home")}
             title={t("appName")}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-white/15 text-[var(--sidebar-text)]">
+            <span
+              className={
+                isRail
+                  ? "flex h-9 w-9 items-center justify-center rounded-md border border-[var(--sidebar-border)] bg-white text-[var(--sidebar-text)] shadow-sm"
+                  : "flex h-9 w-9 items-center justify-center rounded-md bg-white/15 text-[var(--sidebar-text)]"
+              }
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path
                   d="M12 3L4 9v12h16V9l-8-6z"
@@ -83,7 +104,7 @@ export function DesktopSidebar({ userEmail }: { userEmail: string | null }) {
             <BrandLogo variant="prominent" />
           </div>
         )}
-        {!collapsed ? (
+        {!isRail && !collapsed ? (
           <button
             type="button"
             onClick={() => persistCollapsed(true)}
@@ -97,7 +118,7 @@ export function DesktopSidebar({ userEmail }: { userEmail: string | null }) {
         ) : null}
       </div>
 
-      {collapsed ? (
+      {!isRail && collapsed ? (
         <div className="flex justify-center border-b border-[var(--sidebar-border)] py-2">
           <button
             type="button"
@@ -113,7 +134,7 @@ export function DesktopSidebar({ userEmail }: { userEmail: string | null }) {
       ) : null}
 
       <div className="flex flex-1 flex-col overflow-hidden pt-3">
-        <SidebarNav collapsed={collapsed} />
+        <SidebarNav collapsed={isRail || collapsed} hideCreateButton={isRail} />
       </div>
 
       <div
@@ -122,13 +143,13 @@ export function DesktopSidebar({ userEmail }: { userEmail: string | null }) {
           collapsed ? "flex flex-col items-center gap-2 p-2" : "p-4",
         ].join(" ")}
       >
-        {userEmail && !collapsed ? (
+        {userEmail && !collapsed && !isRail ? (
           <p className="mb-3 truncate text-xs text-[var(--sidebar-text-muted)]" title={userEmail}>
             {userEmail}
           </p>
         ) : null}
-        <SignOutButton variant="sidebarLight" collapsed={collapsed} />
-        {!collapsed ? (
+        <SignOutButton variant={isRail ? "sidebar" : "sidebarLight"} collapsed={isRail || collapsed} />
+        {!isRail && !collapsed ? (
           <p className="mt-3 text-xs leading-relaxed text-[var(--sidebar-text-muted)]">{t("sidebarHint")}</p>
         ) : null}
       </div>

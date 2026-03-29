@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
+import { LearningPdLayout } from "@/components/learning/learning-pd-layout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { getLearningAccess } from "@/lib/learning/server-access";
@@ -72,7 +73,13 @@ export default async function StudioCoursePage({ params }: Props) {
   });
 
   return (
-    <AppShell title={`${t("studioTitle")}: ${shell.title}`} titleLocaleNote={shell.titleLocaleNote}>
+    <AppShell
+      title={`${t("studioTitle")}: ${shell.title}`}
+      titleLocaleNote={shell.titleLocaleNote}
+      learningLayout="iconRail"
+      mainClassName="!p-0"
+    >
+      <LearningPdLayout>
       <CourseEditor
         readOnly={readOnly}
         organizationId={course.organization_id}
@@ -89,6 +96,7 @@ export default async function StudioCoursePage({ params }: Props) {
         }}
         initialModules={(modRows ?? []) as LearningModuleRow[]}
       />
+      </LearningPdLayout>
     </AppShell>
   );
 }

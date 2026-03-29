@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
+import { LearningPdLayout } from "@/components/learning/learning-pd-layout";
 import { Link } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
@@ -22,8 +23,10 @@ export default async function LearningStudioPage() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
     return (
-      <AppShell title={t("studioTitle")}>
-        <p className="text-sm text-[var(--color-text-muted)]">Supabase not configured.</p>
+      <AppShell title={t("studioTitle")} learningLayout="iconRail" mainClassName="!p-0">
+        <LearningPdLayout>
+          <p className="text-sm text-[var(--color-text-muted)]">Supabase not configured.</p>
+        </LearningPdLayout>
       </AppShell>
     );
   }
@@ -62,7 +65,8 @@ export default async function LearningStudioPage() {
   }
 
   return (
-    <AppShell title={t("studioTitle")}>
+    <AppShell title={t("studioTitle")} learningLayout="iconRail" mainClassName="!p-0">
+      <LearningPdLayout>
       <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("studioIntro")}</p>
       <div className="mb-6 flex flex-wrap gap-3">
         <Link
@@ -154,6 +158,7 @@ export default async function LearningStudioPage() {
       </section>
 
       <p className="mt-8 text-xs text-[var(--color-text-muted)]">{t("platformAdminHint")}</p>
+      </LearningPdLayout>
     </AppShell>
   );
 }

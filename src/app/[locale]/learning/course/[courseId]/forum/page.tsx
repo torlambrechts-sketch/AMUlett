@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
+import { LearningPdLayout } from "@/components/learning/learning-pd-layout";
 import { Link } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
@@ -45,7 +46,8 @@ export default async function CourseForumPage({ params }: Props) {
   const courseTitle = resolveLocalized(course.title as Record<string, string>, locale).text || course.slug;
 
   return (
-    <AppShell title={`${courseTitle} — ${t("forumTitle")}`}>
+    <AppShell title={`${courseTitle} — ${t("forumTitle")}`} learningLayout="iconRail" mainClassName="!p-0">
+      <LearningPdLayout>
       <div className="mb-6">
         <Link href={`/learning/course/${courseId}/learn`} className="text-sm text-[var(--color-primary)] hover:underline">
           ← {t("backToCourse")}
@@ -68,6 +70,7 @@ export default async function CourseForumPage({ params }: Props) {
           ))
         )}
       </ul>
+      </LearningPdLayout>
     </AppShell>
   );
 }
