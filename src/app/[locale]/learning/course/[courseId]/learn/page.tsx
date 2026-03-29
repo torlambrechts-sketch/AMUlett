@@ -118,7 +118,7 @@ export default async function CourseLearnPage({ params }: Props) {
   const gamificationEnabled = Boolean(settings.gamificationEnabled);
 
   return (
-    <AppShell title={shell.title} titleLocaleNote={shell.titleLocaleNote} learningLayout="learning" mainClassName="!p-0">
+    <AppShell title={shell.title} titleLocaleNote={shell.titleLocaleNote} mainClassName="!p-0">
       <LearningPdLayout>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
         <Link href={`/learning/course/${courseId}`} className="text-sm text-[var(--color-primary)] hover:underline">

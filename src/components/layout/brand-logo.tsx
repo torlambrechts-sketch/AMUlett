@@ -8,7 +8,7 @@ export function BrandLogo({ variant = "header" }: { variant?: "header" | "promin
       href="/"
       className={
         isProminent
-          ? "flex items-center gap-2.5 rounded-[var(--radius-md)] bg-[var(--sidebar-logo-tint)] px-3 py-2 text-[var(--sidebar-text)] transition hover:bg-white/15"
+          ? "flex items-center gap-2.5 rounded-[var(--radius-md)] border border-[var(--sidebar-border)] bg-white px-3 py-2 text-[var(--sidebar-text)] shadow-sm transition hover:bg-[var(--color-surface-elevated)]"
           : "flex items-center gap-2 rounded-[var(--radius-md)] px-1 py-1.5 text-[var(--color-text)] transition hover:bg-[var(--color-surface-elevated)]"
       }
       aria-label="AMUlett home"
@@ -16,7 +16,7 @@ export function BrandLogo({ variant = "header" }: { variant?: "header" | "promin
       <span
         className={
           isProminent
-            ? "flex h-8 w-8 items-center justify-center rounded-md bg-white/20 text-[var(--sidebar-text)]"
+            ? "flex h-8 w-8 items-center justify-center rounded-md bg-[var(--sidebar-logo-tint)] text-[var(--color-primary)]"
             : "flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary-muted)] text-[var(--color-primary)]"
         }
       >

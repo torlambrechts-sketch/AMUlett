@@ -1,39 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  /* Main: light grey canvas + white cards (dashboard reference) */
-  --color-bg: #eef1f5; /* alias; prefer --workspace-bg for main column */
+  /* Default shell: PandaDoc-inspired light sidebar + beige workspace */
+  --color-bg: #f9f8f6;
   --color-surface: #ffffff;
-  --color-surface-elevated: #f8fafc;
-  --color-border: #e2e8f0;
-  --color-text: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-muted: rgba(37, 99, 235, 0.12);
+  --color-surface-elevated: #f7f8f9;
+  --color-border: #e8eaed;
+  --color-text: #1a1d21;
+  --color-text-secondary: #3d4248;
+  --color-text-muted: #6b7280;
+  --color-primary: #2d8e52;
+  --color-primary-hover: #247a47;
+  --color-primary-muted: rgba(45, 142, 82, 0.14);
   --color-primary-fg: #ffffff;
-  --color-accent: #2563eb;
-  --header-logo-bg: #2563eb;
-  /* Sidebar: deep navy + white text */
-  --sidebar-bg: #001a3d;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-text: #ffffff;
-  --sidebar-text-secondary: rgba(255, 255, 255, 0.88);
-  --sidebar-text-muted: rgba(255, 255, 255, 0.62);
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-  /* Active item: light surface on navy (pill) + primary blue label */
-  --sidebar-active-bg: #ffffff;
-  --sidebar-active-text: #2563eb;
-  --sidebar-active-bar: #22c55e;
-  --sidebar-logo-tint: rgba(255, 255, 255, 0.12);
+  --color-accent: #2d8e52;
+  --header-logo-bg: #2d8e52;
+  --sidebar-bg: #f7f8f9;
+  --sidebar-border: #e8eaed;
+  --sidebar-text: #1a1d21;
+  --sidebar-text-secondary: #3d4248;
+  --sidebar-text-muted: #6b7280;
+  --sidebar-hover: rgba(26, 29, 33, 0.06);
+  --sidebar-logo-tint: rgba(45, 142, 82, 0.1);
+  --sidebar-active-bg: rgba(45, 142, 82, 0.12);
+  --sidebar-active-text: #2d8e52;
+  --sidebar-active-bar: #2d8e52;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
-  --shadow-card: 0 1px 3px rgb(15 23 42 / 0.08), 0 4px 14px rgb(15 23 42 / 0.06);
-  /* Workspace (main column only): always light grey — do not tie to OS dark mode */
-  --workspace-bg: #eef1f5;
+  --shadow-sm: 0 1px 2px rgb(26 29 33 / 0.06);
+  --shadow-card: 0 1px 3px rgb(26 29 33 / 0.08), 0 4px 14px rgb(26 29 33 / 0.05);
+  --workspace-bg: #f9f8f6;
   --sidebar-w: 15.5rem;
   --sidebar-w-collapsed: 4.5rem;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -53,25 +50,6 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-}
-
-/* E-learning: PandaDoc-inspired workspace (set via html.learning-ui) */
-html.learning-ui {
-  --workspace-bg: #f9f8f6;
-  --color-primary: #2d8e52;
-  --color-primary-hover: #247a47;
-  --color-primary-muted: rgba(45, 142, 82, 0.14);
-  --color-primary-fg: #ffffff;
-  --sidebar-bg: #f7f8f9;
-  --sidebar-border: #e8eaed;
-  --sidebar-text: #1a1d21;
-  --sidebar-text-secondary: #3d4248;
-  --sidebar-text-muted: #6b7280;
-  --sidebar-hover: rgba(26, 29, 33, 0.06);
-  --sidebar-logo-tint: rgba(45, 142, 82, 0.1);
-  --sidebar-active-bg: rgba(45, 142, 82, 0.12);
-  --sidebar-active-text: #2d8e52;
-  --sidebar-active-bar: #2d8e52;
 }
 
 .learning-pd-workspace {

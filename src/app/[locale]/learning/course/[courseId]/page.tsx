@@ -50,7 +50,7 @@ export default async function CourseDetailPage({ params }: Props) {
   });
 
   return (
-    <AppShell title={shell.title} titleLocaleNote={shell.titleLocaleNote} learningLayout="learning" mainClassName="!p-0">
+    <AppShell title={shell.title} titleLocaleNote={shell.titleLocaleNote} mainClassName="!p-0">
       <LearningPdLayout>
       <LocalizedParagraph
         resolved={descRes}

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
-import { SignOutButton } from "@/components/auth/sign-out-button";
+import { SidebarSearch } from "@/components/layout/sidebar-search";
+import { SidebarUserSection } from "@/components/layout/sidebar-user-section";
 
-export function MobileNav() {
+export function MobileNav({ userEmail }: { userEmail: string | null }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export function MobileNav() {
     <>
       <button
         type="button"
-        className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] lg:hidden"
+        className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[#e8eaed] bg-white text-[var(--color-text)] lg:hidden"
         aria-expanded={open}
         aria-controls="mobile-drawer"
         aria-label="Menu"
@@ -51,12 +52,11 @@ export function MobileNav() {
                 </svg>
               </button>
             </div>
+            <SidebarSearch collapsed={false} />
             <div className="flex-1 overflow-y-auto py-2">
               <SidebarNav onNavigate={() => setOpen(false)} />
             </div>
-            <div className="border-t border-[var(--sidebar-border)] p-4">
-              <SignOutButton variant="sidebar" />
-            </div>
+            <SidebarUserSection userEmail={userEmail} collapsed={false} />
           </div>
         </div>
       ) : null}

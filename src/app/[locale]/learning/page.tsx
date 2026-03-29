@@ -39,11 +39,7 @@ export default async function LearningPage() {
   const canAuthor = access.canAuthorOrg || access.isPlatformAdmin;
 
   return (
-    <AppShell
-      title={t("catalogTitle")}
-      learningLayout="learning"
-      mainClassName="learning-pd-workspace !p-0"
-    >
+    <AppShell title={t("catalogTitle")} mainClassName="learning-pd-workspace !p-0">
       {!org ? (
         <div className="p-6 text-[#6b7280] md:p-8">
           <p className="text-sm">{t("needOrg")}</p>

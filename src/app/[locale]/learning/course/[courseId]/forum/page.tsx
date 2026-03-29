@@ -46,7 +46,7 @@ export default async function CourseForumPage({ params }: Props) {
   const courseTitle = resolveLocalized(course.title as Record<string, string>, locale).text || course.slug;
 
   return (
-    <AppShell title={`${courseTitle} — ${t("forumTitle")}`} learningLayout="learning" mainClassName="!p-0">
+    <AppShell title={`${courseTitle} — ${t("forumTitle")}`} mainClassName="!p-0">
       <LearningPdLayout>
       <div className="mb-6">
         <Link href={`/learning/course/${courseId}/learn`} className="text-sm text-[var(--color-primary)] hover:underline">

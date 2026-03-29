@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { SidebarCreateButton } from "@/components/layout/sidebar-create-button";
 
 const items = [
   { href: "/", key: "home" as const, Icon: IconHome },
@@ -19,30 +18,15 @@ const items = [
 export function SidebarNav({
   onNavigate,
   collapsed = false,
-  hideCreateButton = false,
-  createHref,
-  createLabel,
 }: {
   onNavigate?: () => void;
   collapsed?: boolean;
-  /** PandaDoc-style icon rail: no large create CTA */
-  hideCreateButton?: boolean;
-  createHref?: string;
-  createLabel?: string;
 }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
 
   return (
     <div className="flex h-full flex-col">
-      {hideCreateButton ? null : (
-        <SidebarCreateButton
-          onNavigate={onNavigate}
-          collapsed={collapsed}
-          href={createHref}
-          label={createLabel}
-        />
-      )}
       <nav
         className={["flex flex-1 flex-col gap-0.5", collapsed ? "items-center px-1" : "px-2"].join(" ")}
         aria-label="Main"

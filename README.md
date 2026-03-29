@@ -89,7 +89,7 @@ Design tokens are CSS variables in `src/app/globals.css`: semantic colors, radii
 
 **Feature modules:** Shared product logic that spans LMS and documents lives under `src/modules/` (e.g. `@modules/editor` for TipTap, LMS visual content forms, and wiki block editing). Import only from each module’s `index.ts` so features stay decoupled from internal file layout.
 
-The shell uses a **deep navy sidebar** (`#001a3d`) with **white** navigation text, a **light grey** main canvas, **white** content cards, and **blue** primary actions. The top bar is white on the grey workspace. Design tokens live in `src/app/globals.css`.
+The default shell follows a **PandaDoc-inspired** layout: **light grey sidebar** (`#F7F8F9`), **beige workspace** (`#F9F8F6`), **forest green** primary actions (`#2D8E52`), with search and account controls in the **sidebar** on desktop. The top bar is a slim white strip with the page title (and mobile menu). Design tokens live in `src/app/globals.css`.
 
 ## Deploy
 
