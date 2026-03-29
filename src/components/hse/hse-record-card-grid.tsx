@@ -1,10 +1,13 @@
-import { getTranslations } from "next-intl/server";
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 export type HseCardRecord = {
   id: string;
   record_type: string;
-  title: string;
+  /** Resolved display title (DB stores JSONB). */
+  titleDisplay: string;
   status: string;
   risk_band?: string | null;
   risk_score?: number | null;
@@ -12,8 +15,8 @@ export type HseCardRecord = {
   escalated_to_amu?: boolean | null;
 };
 
-export async function HseRecordCardGrid({ records }: { records: HseCardRecord[] }) {
-  const t = await getTranslations("hse");
+export function HseRecordCardGrid({ records }: { records: HseCardRecord[] }) {
+  const t = useTranslations("hse");
 
   if (records.length === 0) {
     return <p className="py-12 text-center text-sm text-[#6b7280]">{t("emptyRecords")}</p>;
@@ -34,7 +37,9 @@ export async function HseRecordCardGrid({ records }: { records: HseCardRecord[] 
             </div>
             <span className="text-[10px] font-medium uppercase tracking-wide text-[#9ca3af]">{r.record_type.replace(/_/g, " ")}</span>
           </div>
-          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug text-[#111827]">{r.title}</h3>
+          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug text-[#111827]">
+            {r.titleDisplay || "—"}
+          </h3>
           <p className="mt-2 line-clamp-2 text-xs text-[#6b7280]">
             {t("cardStatus")}: {r.status}
             {r.risk_band ? ` · ${r.risk_band}` : ""}

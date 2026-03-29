@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserOrgContext } from "@/lib/org/server";
 import { userIsSafetyRep } from "@/lib/amu/server-access";
+import { resolveLocalized } from "@/lib/learning/localize";
 import { HseDashboardClient } from "@/components/hse/hse-dashboard-client";
 import type { HseCardRecord } from "@/components/hse/hse-record-card-grid";
 
@@ -39,16 +40,19 @@ export default async function HsePage() {
     .eq("organization_id", org.organizationId)
     .eq("record_type", "risk_assessment");
 
-  const cards: HseCardRecord[] = (recent ?? []).map((r) => ({
-    id: r.id,
-    record_type: r.record_type,
-    title: r.title,
-    status: r.status,
-    risk_band: r.risk_band,
-    risk_score: r.risk_score,
-    action_plan_required: r.action_plan_required,
-    escalated_to_amu: r.escalated_to_amu,
-  }));
+  const cards: HseCardRecord[] = (recent ?? []).map((r) => {
+    const titleJson = r.title as Record<string, string> | null | undefined;
+    return {
+      id: r.id,
+      record_type: r.record_type,
+      titleDisplay: resolveLocalized(titleJson, locale).text,
+      status: r.status,
+      risk_band: r.risk_band,
+      risk_score: r.risk_score,
+      action_plan_required: r.action_plan_required,
+      escalated_to_amu: r.escalated_to_amu,
+    };
+  });
 
   return (
     <AppShell title={t("hse")} hideHeaderTitle mainClassName="!p-0">
