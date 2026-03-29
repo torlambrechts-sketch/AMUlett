@@ -1,10 +1,19 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { Link } from "@/i18n/navigation";
 import { fetchPublishedCatalog } from "@/lib/learning/catalog";
 import { getUserOrgContext } from "@/lib/org/server";
 import { getLearningAccess } from "@/lib/learning/server-access";
-import { CatalogCourseCard } from "@/components/learning/catalog-course-card";
+import { LearningAcCatalog } from "@/components/learning/learning-ac-catalog";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+function firstNameFromEmail(email: string | null): string {
+  if (!email) return "";
+  const local = email.split("@")[0] ?? "";
+  const parts = local.split(/[._-]+/).filter(Boolean);
+  const raw = parts[0] ?? local;
+  if (!raw) return "";
+  return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+}
 
 export default async function LearningPage() {
   const t = await getTranslations("lms");
@@ -13,64 +22,33 @@ export default async function LearningPage() {
   const access = await getLearningAccess(org?.organizationId ?? null);
   const catalog = org ? await fetchPublishedCatalog(org.organizationId) : { system: [], organization: [] };
 
+  const supabase = await createSupabaseServerClient();
+  let userEmail: string | null = null;
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userEmail = user?.email ?? null;
+  }
+  const firstName = firstNameFromEmail(userEmail);
+
+  const rows = [...catalog.system, ...catalog.organization];
+  const featured = catalog.system[0] ?? catalog.organization[0] ?? null;
+
   return (
-    <AppShell title={t("catalogTitle")}>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <p className="max-w-2xl text-sm text-[var(--color-text-muted)]">{t("catalogIntro")}</p>
-        {(access.canAuthorOrg || access.isPlatformAdmin) && (
-          <Link
-            href="/learning/studio"
-            className="rounded-[var(--radius-md)] border border-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-primary)] hover:bg-[var(--color-primary-muted)]"
-          >
-            {t("openStudio")}
-          </Link>
-        )}
-      </div>
-
+    <AppShell title={t("catalogTitle")} hideHeaderTitle mainClassName="learning-ac-main !bg-[#f4f7ff] !px-0 !py-0 md:!px-0 md:!py-0 lg:!px-0 lg:!py-0">
       {!org ? (
-        <p className="text-sm text-[var(--color-text-muted)]">{t("needOrg")}</p>
+        <div className="learning-ac-main px-6 py-10 text-[#171a1f]">
+          <p className="text-sm text-[#9095a1]">{t("needOrg")}</p>
+        </div>
       ) : (
-        <>
-          <section className="mb-10">
-            <h2 className="mb-3 text-base font-semibold text-[var(--color-text)]">{t("systemCourses")}</h2>
-            {catalog.system.length === 0 ? (
-              <p className="text-sm text-[var(--color-text-muted)]">{t("noSystemCourses")}</p>
-            ) : (
-              <ul className="grid gap-4 sm:grid-cols-2">
-                {catalog.system.map((c) => (
-                  <CatalogCourseCard
-                    key={c.id}
-                    course={c}
-                    locale={locale}
-                    badge={t("badgeDefault")}
-                    badgeClassName="text-[var(--color-primary)]"
-                    t={t}
-                  />
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <section>
-            <h2 className="mb-3 text-base font-semibold text-[var(--color-text)]">{t("companyCourses")}</h2>
-            {catalog.organization.length === 0 ? (
-              <p className="text-sm text-[var(--color-text-muted)]">{t("noCompanyCourses")}</p>
-            ) : (
-              <ul className="grid gap-4 sm:grid-cols-2">
-                {catalog.organization.map((c) => (
-                  <CatalogCourseCard
-                    key={c.id}
-                    course={c}
-                    locale={locale}
-                    badge={t("badgeCompany")}
-                    badgeClassName="text-[var(--color-text-muted)]"
-                    t={t}
-                  />
-                ))}
-              </ul>
-            )}
-          </section>
-        </>
+        <LearningAcCatalog
+          locale={locale}
+          learnerName={firstName || t("acGuestName")}
+          featured={featured}
+          rows={rows}
+          canAuthor={access.canAuthorOrg || access.isPlatformAdmin}
+        />
       )}
     </AppShell>
   );

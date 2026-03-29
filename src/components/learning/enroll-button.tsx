@@ -7,9 +7,12 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 export function EnrollButton({
   courseId,
   label,
+  className,
 }: {
   courseId: string;
   label: string;
+  /** Optional Tailwind classes (e.g. ActiveCampaign-style primary button). */
+  className?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -51,7 +54,10 @@ export function EnrollButton({
         type="button"
         onClick={enroll}
         disabled={loading}
-        className="rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-primary-fg)] disabled:opacity-50"
+        className={
+          className ??
+          "rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-primary-fg)] disabled:opacity-50"
+        }
       >
         {loading ? "…" : label}
       </button>

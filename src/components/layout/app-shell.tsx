@@ -28,11 +28,17 @@ function displayNameFromEmail(email: string | null): string {
 export async function AppShell({
   title,
   titleLocaleNote,
+  mainClassName,
+  hideHeaderTitle,
   children,
 }: {
   title: string;
   /** Shown under the title when content is missing or shown in another language. */
   titleLocaleNote?: string | null;
+  /** Extra classes for `<main>` (e.g. learning catalog workspace). */
+  mainClassName?: string;
+  /** Hide the page title in the top bar (page supplies its own heading). */
+  hideHeaderTitle?: boolean;
   children: React.ReactNode;
 }) {
   const t = await getTranslations("nav");
@@ -61,12 +67,18 @@ export async function AppShell({
               <BrandLogo />
             </div>
             <div className="min-w-0 sm:flex-1">
-              <h1 className="truncate text-sm font-semibold tracking-tight text-[var(--color-text)] sm:text-base lg:text-lg">
-                {title}
-              </h1>
-              {titleLocaleNote ? (
-                <p className="mt-0.5 truncate text-xs text-amber-800 dark:text-amber-200/90">{titleLocaleNote}</p>
-              ) : null}
+              {hideHeaderTitle ? (
+                <h1 className="sr-only">{title}</h1>
+              ) : (
+                <>
+                  <h1 className="truncate text-sm font-semibold tracking-tight text-[var(--color-text)] sm:text-base lg:text-lg">
+                    {title}
+                  </h1>
+                  {titleLocaleNote ? (
+                    <p className="mt-0.5 truncate text-xs text-amber-800 dark:text-amber-200/90">{titleLocaleNote}</p>
+                  ) : null}
+                </>
+              )}
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
@@ -106,7 +118,11 @@ export async function AppShell({
           </div>
         </header>
 
-        <main className="flex-1 bg-[var(--workspace-bg)] px-4 py-5 md:px-6 md:py-6 lg:px-8">{children}</main>
+        <main
+          className={["flex-1 bg-[var(--workspace-bg)] px-4 py-5 md:px-6 md:py-6 lg:px-8", mainClassName ?? ""].join(" ")}
+        >
+          {children}
+        </main>
       </div>
     </div>
   );
