@@ -1,0 +1,28 @@
+import { getLocale, getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
+import { AppShell } from "@/components/layout/app-shell";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getUserOrgContext } from "@/lib/org/server";
+import { userIsSafetyRep } from "@/lib/amu/server-access";
+import { HseNewRecordForm } from "@/components/hse/hse-new-record-form";
+import { HsePageHeader } from "@/components/hse/hse-page-header";
+
+export default async function HseHaltPage() {
+  const t = await getTranslations("modules");
+  const th = await getTranslations("hse");
+  const locale = await getLocale();
+  const org = await getUserOrgContext();
+  if (!org) redirect(`/${locale}/onboarding`);
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) redirect(`/${locale}/login`);
+
+  const isVo = await userIsSafetyRep(org.organizationId);
+
+  return (
+    <AppShell title={`${t("hse")} — ${th("haltTitle")}`} hideHeaderTitle mainClassName="!p-0">
+      <HsePageHeader title={th("haltTitle")} subtitle={th("haltIntro")} />
+      <HseNewRecordForm organizationId={org.organizationId} kind="halted_work" allowHaltWork={isVo} />
+    </AppShell>
+  );
+}

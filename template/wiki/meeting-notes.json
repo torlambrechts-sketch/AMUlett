@@ -1,0 +1,15 @@
+{
+  "key": "meeting_notes",
+  "label": { "en": "Meeting notes", "nb": "Møtereferat" },
+  "document": {
+    "format": "blocks",
+    "blocks": [
+      {
+        "id": "m1",
+        "type": "text",
+        "content": "## Meeting\n\n**Date:** \n**Attendees:** \n\n## Agenda\n\n1. \n2. \n\n## Notes\n\n\n## Actions\n\n| Owner | Action | Due |\n|-------|--------|-----|\n| | | |"
+      }
+    ],
+    "markdown": ""
+  }
+}

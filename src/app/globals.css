@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  /* Default shell: PandaDoc-inspired light sidebar + beige workspace */
+  --color-bg: #f9f8f6;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f7f8f9;
+  --color-border: #e8eaed;
+  --color-text: #1a1d21;
+  --color-text-secondary: #3d4248;
+  --color-text-muted: #6b7280;
+  --color-primary: #2d8e52;
+  --color-primary-hover: #247a47;
+  --color-primary-muted: rgba(45, 142, 82, 0.14);
+  --color-primary-fg: #ffffff;
+  --color-accent: #2d8e52;
+  --header-logo-bg: #2d8e52;
+  --sidebar-bg: #f7f8f9;
+  --sidebar-border: #e8eaed;
+  --sidebar-text: #1a1d21;
+  --sidebar-text-secondary: #3d4248;
+  --sidebar-text-muted: #6b7280;
+  --sidebar-hover: rgba(26, 29, 33, 0.06);
+  --sidebar-logo-tint: rgba(45, 142, 82, 0.1);
+  --sidebar-active-bg: rgba(45, 142, 82, 0.12);
+  --sidebar-active-text: #2d8e52;
+  --sidebar-active-bar: #2d8e52;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgb(26 29 33 / 0.06);
+  --shadow-card: 0 1px 3px rgb(26 29 33 / 0.08), 0 4px 14px rgb(26 29 33 / 0.05);
+  --workspace-bg: #f9f8f6;
+  --sidebar-w: 15.5rem;
+  --sidebar-w-collapsed: 4.5rem;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--workspace-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.learning-pd-workspace {
+  background: var(--workspace-bg);
+}
+
+.learning-pd-card {
+  border-radius: 12px;
+  border: 1px solid rgb(232 234 237);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgb(26 29 33 / 0.06);
+}
+
+.learning-pd-muted {
+  color: #6b7280;
+}
+
+.learning-pd-accent-gold {
+  color: #8e7c3e;
+}
+
+.learning-ac-serif {
+  font-family: var(--font-learning-serif), Georgia, "Times New Roman", serif;
+}

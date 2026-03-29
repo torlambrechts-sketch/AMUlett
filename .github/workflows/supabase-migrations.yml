@@ -1,0 +1,38 @@
+# Apply SQL migrations to your Supabase Postgres when you push migration files.
+#
+# Setup (one time in GitHub):
+#   1. Repo → Settings → Secrets and variables → Actions
+#   2. New repository secret: POSTGRES_URL_NON_POOLING
+#      Value: Supabase → Project Settings → Database → Connection string → URI
+#      Use the direct connection (port 5432), postgres user + your database password.
+#
+# Run: push to main with changes under supabase/migrations/, or use Actions → "Run workflow".
+
+name: Apply Supabase migrations
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install psql
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Apply migrations in order
+        env:
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+        run: |
+          if [ -z "$POSTGRES_URL_NON_POOLING" ]; then
+            echo "Missing secret POSTGRES_URL_NON_POOLING. Add it under repo Settings → Secrets → Actions."
+            exit 1
+          fi
+          chmod +x scripts/apply-migrations.sh
+          ./scripts/apply-migrations.sh
