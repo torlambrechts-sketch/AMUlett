@@ -7,6 +7,7 @@ import { getUserOrgContext } from "@/lib/org/server";
 import { resolveLocalized } from "@/lib/learning/localize";
 import { userCanWikiWrite } from "@/lib/wiki/server-access";
 import { WikiDiffView } from "@/components/wiki/wiki-diff-view";
+import { DocumentsPdLayout } from "@/components/documents/documents-pd-layout";
 
 type Props = {
   params: Promise<{ spaceSlug: string; pageSlug: string }>;
@@ -61,7 +62,8 @@ export default async function WikiComparePage({ params, searchParams }: Props) {
   const titleRes = resolveLocalized(page.title as Record<string, string>, locale);
 
   return (
-    <AppShell title={`${t("compare")}: ${titleRes.text || page.slug}`}>
+    <AppShell title={`${t("compare")}: ${titleRes.text || page.slug}`} mainClassName="!p-0">
+      <DocumentsPdLayout>
       <div className="mb-4 flex flex-wrap gap-3 text-sm">
         <Link href={`/documents/s/${spaceSlug}/p/${pageSlug}/history`} className="text-[var(--color-primary)] hover:underline">
           ← {t("history")}
@@ -106,6 +108,7 @@ export default async function WikiComparePage({ params, searchParams }: Props) {
           </button>
         </form>
       ) : null}
+      </DocumentsPdLayout>
     </AppShell>
   );
 }

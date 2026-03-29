@@ -7,6 +7,7 @@ import { getUserOrgContext } from "@/lib/org/server";
 import { resolveLocalized } from "@/lib/learning/localize";
 import { userCanWikiWrite } from "@/lib/wiki/server-access";
 import { WikiRollbackButton } from "@/components/wiki/wiki-rollback-button";
+import { DocumentsPdLayout } from "@/components/documents/documents-pd-layout";
 
 type Props = { params: Promise<{ spaceSlug: string; pageSlug: string }> };
 
@@ -50,7 +51,8 @@ export default async function WikiHistoryPage({ params }: Props) {
   const titleRes = resolveLocalized(page.title as Record<string, string>, locale);
 
   return (
-    <AppShell title={`${t("history")}: ${titleRes.text || page.slug}`}>
+    <AppShell title={`${t("history")}: ${titleRes.text || page.slug}`} mainClassName="!p-0">
+      <DocumentsPdLayout>
       <div className="mb-4 flex flex-wrap gap-3 text-sm">
         <Link href={`/documents/s/${spaceSlug}/p/${pageSlug}`} className="text-[var(--color-primary)] hover:underline">
           {t("viewPage")}
@@ -88,6 +90,7 @@ export default async function WikiHistoryPage({ params }: Props) {
           </li>
         ))}
       </ul>
+      </DocumentsPdLayout>
     </AppShell>
   );
 }

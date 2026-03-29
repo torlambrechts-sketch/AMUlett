@@ -459,6 +459,11 @@
   },
   "documents": {
     "title": "Document center",
+    "subnavLabel": "Document center navigation",
+    "subnavSection": "Documents",
+    "subnavLibrary": "Library & hub",
+    "subnavBrowse": "Wiki pages",
+    "subnavSettings": "Workspace settings",
     "intro": "Hierarchical wiki pages, version history, full-text search, and optional approval before publishing. Content and permissions are stored in the database.",
     "setupError": "Could not prepare the document space.",
     "migrationHint": "Apply migration 20250326240000_wiki_document_center.sql (or the bundled ALL_MIGRATIONS.sql) in Supabase.",

@@ -13,6 +13,7 @@ import { userCanWikiWrite, userIsOrgAdmin } from "@/lib/wiki/server-access";
 import { WikiFavoriteButton } from "@/components/wiki/wiki-favorite-button";
 import { WikiPresenceBar } from "@/components/wiki/wiki-presence";
 import { WikiDeleteButton } from "@/components/documents/wiki-delete-button";
+import { DocumentsPdLayout } from "@/components/documents/documents-pd-layout";
 
 type Props = { params: Promise<{ spaceSlug: string; pageSlug: string }> };
 
@@ -102,7 +103,9 @@ export default async function WikiPageView({ params }: Props) {
     <AppShell
       title={titleRes.text || page.slug}
       titleLocaleNote={!titleRes.localeMatched && titleRes.usedLocale ? t("titleFromLocale", { locale: titleRes.usedLocale }) : undefined}
+      mainClassName="!p-0"
     >
+      <DocumentsPdLayout>
       <div className="mb-4 flex flex-wrap items-center gap-3 text-sm">
         <Link href="/documents" className="text-[var(--color-primary)] hover:underline">
           {t("backToHub")}
@@ -168,6 +171,7 @@ export default async function WikiPageView({ params }: Props) {
           <WikiToc entries={tocEntries} />
         </aside>
       </div>
+      </DocumentsPdLayout>
     </AppShell>
   );
 }

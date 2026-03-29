@@ -11,6 +11,7 @@ import { getOrCreateDefaultWikiSpace } from "@/lib/wiki/get-default-space";
 import { DocumentLibraryUpload } from "@/components/documents/document-library-upload";
 import { DocumentLibraryFilters } from "@/components/documents/document-library-filters";
 import { DocumentLibraryTable, type LibraryRow, type WikiLibraryRow, type FileLibraryRow } from "@/components/documents/document-library-table";
+import { DocumentsPdLayout } from "@/components/documents/documents-pd-layout";
 import { isLibraryCategory, type LibraryCategory } from "@/lib/documents/library-categories";
 
 type Props = {
@@ -136,12 +137,16 @@ export default async function DocumentsHubPage({ searchParams }: Props) {
 
   if (!spaceId) {
     return (
-      <AppShell title={t("title")}>
-        <p className="text-sm text-red-600">
-          {t("setupError")} {spaceErr ?? ""}
-        </p>
-        <p className="mt-2 text-xs text-[var(--color-text-muted)]">{t("migrationHint")}</p>
-        {spaceErr?.includes("wiki.write") ? <p className="mt-2 text-sm text-[var(--color-text-muted)]">{t("askWikiAuthor")}</p> : null}
+      <AppShell title={t("title")} mainClassName="!p-0">
+        <DocumentsPdLayout>
+          <div className="p-4 md:p-0">
+            <p className="text-sm text-red-600">
+              {t("setupError")} {spaceErr ?? ""}
+            </p>
+            <p className="mt-2 text-xs text-[var(--color-text-muted)]">{t("migrationHint")}</p>
+            {spaceErr?.includes("wiki.write") ? <p className="mt-2 text-sm text-[var(--color-text-muted)]">{t("askWikiAuthor")}</p> : null}
+          </div>
+        </DocumentsPdLayout>
       </AppShell>
     );
   }
@@ -150,8 +155,12 @@ export default async function DocumentsHubPage({ searchParams }: Props) {
 
   if (!space) {
     return (
-      <AppShell title={t("title")}>
-        <p className="text-sm text-[var(--color-text-muted)]">{t("noSpace")}</p>
+      <AppShell title={t("title")} mainClassName="!p-0">
+        <DocumentsPdLayout>
+          <div className="p-4 md:p-0">
+            <p className="text-sm text-[var(--color-text-muted)]">{t("noSpace")}</p>
+          </div>
+        </DocumentsPdLayout>
       </AppShell>
     );
   }
@@ -239,10 +248,12 @@ export default async function DocumentsHubPage({ searchParams }: Props) {
       : [];
 
   return (
-    <AppShell title={t("title")}>
-      <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("intro")}</p>
+    <AppShell title={t("title")} mainClassName="!p-0">
+      <DocumentsPdLayout>
+        <div>
+          <p className="mb-6 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("intro")}</p>
 
-      <section className="mb-10">
+          <section className="mb-10">
         <h2 className="mb-3 text-base font-semibold text-[var(--color-text)]">{t("libraryTitle")}</h2>
         <p className="mb-4 max-w-2xl text-sm text-[var(--color-text-muted)]">{t("libraryIntro")}</p>
         {fileErr && fileErr.code !== "42P01" ? (
@@ -290,7 +301,7 @@ export default async function DocumentsHubPage({ searchParams }: Props) {
         </section>
       ) : null}
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,280px)_1fr]">
+      <div id="wiki-tree" className="scroll-mt-6 grid gap-8 lg:grid-cols-[minmax(0,280px)_1fr]">
         <div>
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-[var(--color-text)]">{t("treeTitle")}</h2>
@@ -311,6 +322,8 @@ export default async function DocumentsHubPage({ searchParams }: Props) {
           </ul>
         </div>
       </div>
+        </div>
+      </DocumentsPdLayout>
     </AppShell>
   );
 }

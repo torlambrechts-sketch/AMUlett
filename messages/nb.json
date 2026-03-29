@@ -459,6 +459,11 @@
   },
   "documents": {
     "title": "Dokumentsenter",
+    "subnavLabel": "Navigasjon dokumentsenter",
+    "subnavSection": "Dokumenter",
+    "subnavLibrary": "Bibliotek og oversikt",
+    "subnavBrowse": "Wiki-sider",
+    "subnavSettings": "Arbeidsområdeinnstillinger",
     "intro": "Hierarkisk wiki, versjonshistorikk, fulltekstsøk og valgfri godkjenning før publisering. Innhold og tilganger ligger i databasen.",
     "setupError": "Kunne ikke klargjøre dokumentområdet.",
     "migrationHint": "Kjør migrasjon 20250326240000_wiki_document_center.sql (eller ALL_MIGRATIONS.sql) i Supabase.",

@@ -7,6 +7,7 @@ import { getUserOrgContext } from "@/lib/org/server";
 import { userCanWikiWrite } from "@/lib/wiki/server-access";
 import { loadWikiTemplates } from "@/lib/wiki/templates";
 import { WikiNewPageForm } from "@/components/wiki/wiki-new-page-form";
+import { DocumentsPdLayout } from "@/components/documents/documents-pd-layout";
 
 type Props = { params: Promise<{ spaceSlug: string }> };
 
@@ -41,7 +42,8 @@ export default async function WikiNewPage({ params }: Props) {
   const templates = loadWikiTemplates();
 
   return (
-    <AppShell title={t("newPageTitle")}>
+    <AppShell title={t("newPageTitle")} mainClassName="!p-0">
+      <DocumentsPdLayout>
       <Link href="/documents" className="mb-6 inline-block text-sm text-[var(--color-primary)] hover:underline">
         ← {t("backToHub")}
       </Link>
@@ -52,6 +54,7 @@ export default async function WikiNewPage({ params }: Props) {
         templates={templates}
         locale={locale}
       />
+      </DocumentsPdLayout>
     </AppShell>
   );
 }
